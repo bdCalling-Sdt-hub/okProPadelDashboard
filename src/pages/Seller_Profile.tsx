@@ -56,18 +56,23 @@ const Seller_Profile = (props: Props) => {
     sId: index + 1,
     image: <img src={image} className="w-9 h-9 rounded" alt="avatar" />,
     productName: "KTM 390Duke",
-    productCategory: "Vehicle",
-    price: "$6729.00",
+    level: "2",
+    status: "Created",
+    date: "05-08-2024", 
+    location: "Madrid",
     quantity: "Quantity",
-    // status: "Approved",
+   
     action: {
       sId: index + 1,
       image: <img src={image} className="w-9 h-9 rounded" alt="" />,
       productName: "KTM 390Duke",
+      level: "2",
+      location: "Madrid",
+      date: "05-08-2024",
       productCategory: "Vehicle",
       price: "$6729.00",
       quantity: "quantity",
-      // status: "Approved",
+      status: "Approved",
       dateOfBirth: "24-05-2024",
       contact: "0521545861520",
     },
@@ -86,25 +91,26 @@ const Seller_Profile = (props: Props) => {
       ),
     },
     {
-      title: "Category",
-      dataIndex: "productCategory",
-      key: "category",
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
     },
     {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
+      title: "Level",
+      dataIndex: "level",
+      key: "level",
     },
     {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
+      title: "Location",
+      dataIndex: "location",
+      key: "location",
     },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   key: "status",
-    // },
+    {
+      title: "Date",
+      dataIndex: "date",
+      key: "date",
+    },
+    
     {
       title: <div className="text-right">Action</div>,
       dataIndex: "action",
@@ -163,13 +169,13 @@ const handleBack = () => {
       <div className="flex justify-between w-full">
         <div onClick={handleBack} className="flex cursor-pointer">
           <ChevronLeft />
-          <h1>Seller Profile</h1>
+          <h1>User Profile</h1>
         </div>
         <div>
           <Input
             prefix={<Search />}
             className=" rounded-2xl h-12 bg-base border-0 text-primary placeholder:text-gray-200"
-            placeholder="Search for Listing"
+            placeholder="Search here"
             style={{
               backgroundColor: "#f0f0f0",
               color: "#333333",
@@ -185,25 +191,22 @@ const handleBack = () => {
             <p className="">Location: Times square, USA</p>
             <p> hasanmahmud@gmail.com</p>
           </div>
-          <div className="grid grid-cols-3 py-12 gap-4 p-4">
+          <div className="grid grid-cols-2 py-12 gap-4 p-4 ">
+           
             <div className="border border-gray-200 py-6 4/12 rounded-md px-6 ">
-              <p>Products</p>
-              <h1 className="text-xl font-bold">$4,856</h1>
+              <p>Created</p>
+              <h1 className="text-xl font-bold">26</h1>
             </div>
             <div className="border border-gray-200 py-6 4/12 rounded-md px-6 ">
-              <p>Sells</p>
-              <h1 className="text-xl font-bold">$4,856</h1>
-            </div>
-            <div className="border border-gray-200 py-6 4/12 rounded-md px-6 ">
-              <p>Pending orders</p>
-              <h1 className="text-xl font-bold">$4,856</h1>
+              <p>Played</p>
+              <h1 className="text-xl font-bold">56</h1>
             </div>
           </div>
         </div>
 
         <div className=" h-[350px] w-1/2 py-4 justify-center bg-white rounded-2xl">
           <div className="flex justify-between w-full px-6">
-            <div className="text-lg font-bold">Activities</div>
+            <div className="text-lg font-bold">Match Activities</div>
             <div>
               <SelectBox
                 placeholder="Last week"
@@ -217,7 +220,7 @@ const handleBack = () => {
         </div>
       </div>
       <div className="mt-28 bg-white ">
-        <h1 className="p-4 text-xl font-bold">Product Listing</h1>
+        <h1 className="p-4 text-xl font-bold">Match Listing</h1>
         <CustomTable
           dataSource={data}
           columns={columns}
