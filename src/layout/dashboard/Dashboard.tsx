@@ -36,6 +36,13 @@ const menuItems: MenuItem[] = [
     activeIcon: <FaChartPie size={18} color="white" />,
   },
   {
+    path: "/manage-users",
+    title: "Manage Users",
+    icon: <FaRegUserCircle size={18} color="white" />,
+    activeIcon: <FaUserCircle size={18} color="white" />,
+
+  },
+  {
     path: "/productListing",
     title: "Product Listing",
     icon: <img src={productListing} alt="Logo" width={18} height={18} />,
@@ -47,13 +54,7 @@ const menuItems: MenuItem[] = [
     icon: <img src={categoryManagement} alt="Logo" width={18} height={18} color="white" />,
     activeIcon: <img src={categoryManagement1} alt="Logo" width={18} height={18} color="white" />,
   },
-  {
-    path: "/manage-users",
-    title: "Manage Users",
-    icon: <FaRegUserCircle size={18} color="white" />,
-    activeIcon: <FaUserCircle size={18} color="white" />,
-
-  },
+ 
   {
     path: "/love",
     title: "Love",

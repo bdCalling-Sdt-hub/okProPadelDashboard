@@ -47,6 +47,26 @@ const Manage_Users = () => {
       ),
     },
     {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Location",
+      dataIndex: "location",
+      key: "location",
+    },
+    {
+      title: "Level",
+      dataIndex: "level",
+      key: "level",
+    },
+    {
+      title: "Skill",
+      dataIndex: "skill",
+      key: "skill",
+    },
+    {
       title: "Role",
       dataIndex: "role",
       key: "role",
@@ -106,7 +126,7 @@ const Manage_Users = () => {
       <Input
         prefix={<Search />}
         className="w-full rounded-2xl h-12 bg-base border-0 text-primary placeholder:text-gray-200"
-        placeholder="Search for Listing"
+        placeholder="Search by email"
         style={{
           backgroundColor: "#f0f0f0",
           color: "#333333",
