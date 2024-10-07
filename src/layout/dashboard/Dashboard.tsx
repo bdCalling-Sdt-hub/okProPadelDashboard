@@ -17,6 +17,8 @@ import SubMenu from "antd/es/menu/SubMenu";
 import "./Styled_components.css";
 import { BiPieChartAlt2 } from "react-icons/bi";
 import { IoIosCard } from "react-icons/io";
+import Questionaries from "../../assets/Images/dashboard/questionaries.svg";
+
 
 const { Header, Sider, Content } = Layout;
 
@@ -44,29 +46,29 @@ const menuItems: MenuItem[] = [
   },
   {
     path: "/productListing",
-    title: "Product Listing",
+    title: "Request",
     icon: <img src={productListing} alt="Logo" width={18} height={18} />,
     activeIcon: <img src={productListing1} alt="Logo" width={18} height={18}  />,
   },
   {
     path: "/category_management",
-    title: "Category Management",
+    title: "Volunteer",
     icon: <img src={categoryManagement} alt="Logo" width={18} height={18} color="white" />,
     activeIcon: <img src={categoryManagement1} alt="Logo" width={18} height={18} color="white" />,
   },
  
   {
-    path: "/love",
-    title: "Love",
-    icon: <FaRegHeart color="white" size={18} />,
-    activeIcon: <FaHeart size={18} color="white" />,
+    path: "/questionaries",
+    title: "Questionaries",
+    icon: <img src={Questionaries} alt="Logo" width={18} height={18} color="white" />,
+    activeIcon: <img src={Questionaries} alt="Logo" width={18} height={18} color="white" />,
   },
-  {
-    path: "/transactions",
-    title: "Transactions",
-    icon: <img src={transaction} alt="Logo" width={18} height={18} color="white"/>,
-    activeIcon: <img src={transaction1} alt="Logo" width={18} height={18} color="white" />,
-  },
+  // {
+  //   path: "/transactions",
+  //   title: "Transactions",
+  //   icon: <img src={transaction} alt="Logo" width={18} height={18} color="white"/>,
+  //   activeIcon: <img src={transaction1} alt="Logo" width={18} height={18} color="white" />,
+  // },
   {
     path: "/settings",
     title: "Settings",
@@ -131,13 +133,13 @@ const Dashboard: React.FC = () => {
           </h1>
         );
       case "/productListing":
-        return <h1 className="text-[#333333] font-bold text-[24px]">Manage Listings</h1>;
+        return <h1 className="text-[#333333] font-bold text-[24px]">Request</h1>;
       case "/category_management":
-        return <h1 className="text-[#333333] font-bold text-[24px]">Manage Category</h1>;
+        return <h1 className="text-[#333333] font-bold text-[24px]">Volunteer</h1>;
       case "/manage-users":
         return <h1 className="text-[#333333] font-bold text-[24px]">Manage Users</h1>;
-      case "/love":
-        return <h1 className="text-[#333333] font-bold text-[24px]">Love</h1>;
+      case "/questionaries":
+        return <h1 className="text-[#333333] font-bold text-[24px]">Questionaries</h1>;
       case "/transactions":
         return <h1 className="text-[#333333] font-bold text-[24px]">Transactions</h1>;
       case "/settings":

@@ -18,6 +18,9 @@ const Manage_Users = () => {
     sId: index + 1,
     image: <img src={image} className="w-9 h-9 rounded" alt="avatar" />,
     name: "User " + (index + 1),
+    email: 'maira@padel.com',
+    location: 'Madrid',
+    level: '2',
     role: index % 2 === 0 ? "Admin" : "Member", // Dynamic role for each user
     action: {
       sId: index + 1,
@@ -61,11 +64,11 @@ const Manage_Users = () => {
       dataIndex: "level",
       key: "level",
     },
-    {
-      title: "Skill",
-      dataIndex: "skill",
-      key: "skill",
-    },
+    // {
+    //   title: "Skill",
+    //   dataIndex: "skill",
+    //   key: "skill",
+    // },
     {
       title: "Role",
       dataIndex: "role",

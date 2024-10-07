@@ -1,8 +1,10 @@
-import { Input, Table } from "antd";
+import { Input, Table, Select, Modal, DatePicker, TimePicker, Button } from "antd";
 import React, { useState } from "react";
-import image from "../assets/Images/Notifications/Avatar.png";
-import { Trash, Search, Pencil } from "lucide-react";
+import { Search } from "lucide-react";
 import ModalComponent from "../component/share/ModalComponent";
+import moment from 'moment';
+
+const { Option } = Select;
 
 interface UserAction {
   sId: number;
@@ -20,6 +22,9 @@ interface UserData {
   name: string;
   email: string;
   status: string;
+  currentLevel: string;
+  requestedLevel: string;
+  club: string;
   action: UserAction;
 }
 
@@ -28,27 +33,29 @@ interface ProductListingProps {}
 const ProductListing: React.FC<ProductListingProps> = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModel, setOpenModel] = useState<boolean>(false);
-  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [openTrialModal, setOpenTrialModal] = useState<boolean>(false);
   const [userData, setUserData] = useState<UserAction>({} as UserAction);
-  const [type, setType] = useState<string>("");
+  const [selectedClubs, setSelectedClubs] = useState<{ [key: number]: string }>({});
+  const [trialMatchData, setTrialMatchData] = useState<UserData | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<number[]>([]);
+  const [selectedOpponents, setSelectedOpponents] = useState<number[]>([]);
 
   const pageSize = 10;
 
+  const clubs = ["Spania", "Barcelona", "Madrid", "Liverpool", "Chelsea", "Arsenal", "Real Madrid", "PSG", "Manchester United", "Juventus"];
+
   const data: UserData[] = [...Array(9).keys()].map((item, index) => ({
     sId: index + 1,
-    image: <img src={image} className="w-9 h-9 rounded" alt="avatar" />,
-    name: "KTM 390Duke",
-    category: "Vehicle",
-    price: "$6729.00",
-    quantity: "Quantity",
+    name: `Player ${index + 1}`,
+    location: "New York, USA",
+    currentLevel: "2",
+    requestedLevel: "3",
+    club: selectedClubs[index + 1] || 'Spania',
     status: "Approved",
     action: {
       sId: index + 1,
-      image: <img src={image} className="w-9 h-9 rounded" alt="" />,
-      name: "Fahim",
-      category: "Category",
-      price: "$6729.00",
-      quantity: "quantity",
+      name: `Player ${index + 1}`,
+      email: `player${index + 1}@example.com`,
       status: "Approved",
       dateOfBirth: "24-05-2024",
       contact: "0521545861520",
@@ -57,55 +64,59 @@ const ProductListing: React.FC<ProductListingProps> = () => {
 
   const columns = [
     {
-      title: "Listing",
-      dataIndex: "image",
-      key: "image",
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Location",
+      dataIndex: "location",
+      key: "location",
+    },
+    {
+      title: "Current Level",
+      dataIndex: "currentLevel",
+      key: "currentLevel",
+    },
+    {
+      title: "Requested Level",
+      dataIndex: "requestedLevel",
+      key: "requestedLevel",
+    },
+    {
+      title: "Club",
+      dataIndex: "club",
+      key: "club",
       render: (_: any, record: UserData) => (
-        <div className="flex items-center">
-          {record.image}
-          <span className="ml-3">{record.name}</span>
-        </div>
+        <Select
+          defaultValue={record.club}
+          style={{ width: 120 }}
+          onChange={(value) => handleClubChange(record.sId, value)}
+          dropdownRender={(menu) => (
+            <div style={{ maxHeight: 150, overflowY: 'auto' }}>
+              {menu}
+            </div>
+          )}
+        >
+          {clubs.map((club) => (
+            <Option key={club} value={club}>
+              {club}
+            </Option>
+          ))}
+        </Select>
       ),
     },
     {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-    },
-    {
-      title: <div className="text-right">Action</div>,
-      dataIndex: "action",
-      key: "action",
+      title: "Trial Matches",
+      dataIndex: "trialMatches",
+      key: "trialMatches",
       render: (_: any, record: UserData) => (
-        <div className="flex items-center justify-end gap-3">
-          <button
-            onClick={() => handleUser(record.action)}
-            className="hover:bg-primary p-1 rounded bg-blue"
-          >
-            <Pencil />
-          </button>
-          <button
-            onClick={() => handleDelete(record.action)}
-            className="bg-secondary px-3 py-1 rounded hover:bg-primary"
-          >
-            <Trash />
-          </button>
-        </div>
+        <button
+          onClick={() => handleTrialMatches(record)}
+          className="text-[#00BCE6] px-3"
+        >
+          Set Up
+        </button>
       ),
     },
   ];
@@ -114,27 +125,20 @@ const ProductListing: React.FC<ProductListingProps> = () => {
     setCurrentPage(page);
   };
 
-  const handleUser = (values: UserAction) => {
-    setUserData(values);
-    setOpenModel(true);
-    setType("user");
+  const handleClubChange = (sId: number, value: string) => {
+    setSelectedClubs((prev) => ({ ...prev, [sId]: value }));
   };
 
-  const handleDelete = (values: UserAction) => {
-    setUserData(values);
-    setOpenDeleteModal(true);
+  const handleTrialMatches = (record: UserData) => {
+    setTrialMatchData(record);  // Set the data for the modal
+    setOpenTrialModal(true);  // Open the trial match modal
   };
 
-  const confirmApprove = () => {
-    console.log("Approved:", userData);
-    setOpenModel(false);
-    // Add approve logic here
-  };
-
-  const confirmDelete = () => {
-    console.log("Deleted:", userData);
-    setOpenDeleteModal(false);
-    // Add delete logic here
+  const confirmTrialMatch = () => {
+    console.log("Trial match created with:");
+    console.log("Team:", selectedTeam);
+    console.log("Opponents:", selectedOpponents);
+    setOpenTrialModal(false);
   };
 
   return (
@@ -162,25 +166,58 @@ const ProductListing: React.FC<ProductListingProps> = () => {
           }}
           rowClassName={() => "hover:bg-transparent"}
         />
-        <ModalComponent
-          openModel={openModel}
-          setOpenModel={setOpenModel}
-          title="Approve Item"
-          subtitle="Are you sure you want to approve the product?"
-          cancelLabel="Cancel"
-          confirmLabel="Approve"
-          onConfirm={confirmApprove} // Your approve logic
-        />
 
-        <ModalComponent
-          openModel={openDeleteModal}
-          setOpenModel={setOpenDeleteModal}
-          title="Delete Item"
-          subtitle="Are you sure you want to delete this item?"
-          confirmLabel="Delete"
-          cancelLabel="Cancel"
-          onConfirm={confirmDelete} // Your delete logic
-        />
+        {/* Trial Match Modal */}
+        <Modal
+          title="Setup a Trial Match"
+          visible={openTrialModal}
+          onCancel={() => setOpenTrialModal(false)}
+          footer={[
+            <Button key="cancel" onClick={() => setOpenTrialModal(false)}>
+              Cancel
+            </Button>,
+            <Button key="create" type="primary" onClick={confirmTrialMatch}>
+              Create Trial Match
+            </Button>,
+          ]}
+        >
+          <div>
+            <h3>Team</h3>
+            <Select
+              mode="multiple"
+              style={{ width: '100%' }}
+              placeholder="Select Team"
+              onChange={(values) => setSelectedTeam(values)}
+            >
+              {data.map((player) => (
+                <Option key={player.sId} value={player.sId}>
+                  {player.name}
+                </Option>
+              ))}
+            </Select>
+
+            <h3>Opponent</h3>
+            <Select
+              mode="multiple"
+              style={{ width: '100%' }}
+              placeholder="Select Opponents"
+              onChange={(values) => setSelectedOpponents(values)}
+            >
+              {data.map((player) => (
+                <Option key={player.sId} value={player.sId}>
+                  {player.name}
+                </Option>
+              ))}
+            </Select>
+
+            <h3>Schedule</h3>
+            <TimePicker style={{ width: '100%' }} defaultValue={moment('12:08', 'HH:mm')} />
+            <DatePicker style={{ width: '100%', marginTop: 10 }} />
+
+            <h3>Club</h3>
+            <div>{trialMatchData?.club}</div>
+          </div>
+        </Modal>
       </div>
     </div>
   );

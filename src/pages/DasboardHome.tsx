@@ -20,7 +20,7 @@ const DasboardHome = (props: Props) => {
     <>
       <Status />
       <div className="flex gap-4">
-        <div className=" h-[350px] w-1/2 mt-8 justify-center bg-white rounded-2xl">
+        <div className=" h-[350px] w-full mt-8 justify-center bg-white rounded-2xl">
           <div className="flex justify-between w-full px-6">
             <div className="text-lg font-bold">Activities</div>
             <div>
@@ -34,9 +34,9 @@ const DasboardHome = (props: Props) => {
           </div>
           <SellerActivityChart />
         </div>
-        <div className=" h-[350px] w-1/2 mt-8 justify-center bg-white rounded-2xl">
+        {/* <div className=" h-[350px] w-1/2 mt-8 justify-center bg-white rounded-2xl">
           <div className="flex justify-between w-full px-6">
-            <div className="text-lg font-bold">Activities</div>
+            <div className="text-lg font-bold">Clubs</div>
             <div>
               <SelectBox
                 placeholder="Last week"
@@ -46,8 +46,8 @@ const DasboardHome = (props: Props) => {
               />
             </div>
           </div>
-          {/* <SellerActivityChart /> */}
-        </div>
+          
+        </div> */}
       </div>
     </>
   );

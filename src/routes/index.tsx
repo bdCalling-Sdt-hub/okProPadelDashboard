@@ -19,6 +19,7 @@ import Settings_personalInformation from "../pages/Settings_personalInformation"
 import SettingsFaq from "../pages/SettingsFaq";
 import SettingsTermsAndConditions from "../pages/SettingsTermsAndConditions";
 import EditTermsAndCondition from "../pages/EditTermsAndConditions";
+import Questionaries from "../pages/Questionaries";
 
 
 
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
             {
                 path: "/transactions",
                 element: <Transactions />,
+            },
+            {
+                path: "/questionaries",
+                element: <Questionaries />
             },
             {
                 path: "/settings",
