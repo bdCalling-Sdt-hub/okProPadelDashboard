@@ -7,26 +7,8 @@ import {
   Input,
   RadioChangeEvent,
 } from "antd";
-import React, { useState } from "react";
-
-const { Option } = Select;
-
-interface ModalComponentProps {
-  openModel: boolean;
-  setOpenModel: (open: boolean) => void;
-  title: string;
-  subtitle: string;
-  cancelLabel?: string;
-  confirmLabel?: string;
-  onCancel?: () => void;
-  onConfirm?: () => void;
-  children?: React.ReactNode;
-  role?: string; // The role to display or change
-  setRole?: (role: string) => void; // Function to change the role
-  showRoleSelect?: boolean; // New prop to conditionally show the Select dropdown
-  value?: any; // Dynamic data value (User data)
-  inputValue: string;
-}
+import React, { useState, useEffect } from "react";
+import { usePutChangeUserStatusMutation } from "../../redux/features/putChangeUserStatus";
 
 const ModalComponent: React.FC<ModalComponentProps> = ({
   openModel,
@@ -38,11 +20,19 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   onCancel,
   onConfirm,
   children,
-  role, // The selected role
-  setRole, // Function to set the role dynamically
-  showRoleSelect = false, // Default: hide the role select
-  value, // Dynamic user data
+  role,
+  setRole,
+  showRoleSelect = false,
+  value,
 }) => {
+  const [inputValue, setInputValue] = useState(1);
+  const [putChangeUserStatus] = usePutChangeUserStatusMutation();
+
+  // Log value to verify if the id is being passed correctly
+  useEffect(() => {
+    console.log("ModalComponent received value:", value);
+  }, [value]);
+
   const hideModal = () => {
     setOpenModel(false);
     if (onCancel) onCancel();
@@ -50,14 +40,37 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
 
   const handleApprove = () => {
     if (onConfirm) onConfirm();
+    updateUserStatus(); // Call the API function here
     hideModal();
   };
 
-  const [inputValue, setInputValue] = useState(1);
-
   const onChange = (e: RadioChangeEvent) => {
-    console.log("radio checked", e.target.value);
+    console.log("Radio checked", e.target.value);
     setInputValue(e.target.value);
+  };
+
+  // Function to update user status via API
+  const updateUserStatus = async () => {
+    if (!value?.id) {
+      console.error("User ID is undefined");
+      return;
+    }
+
+    // Map inputValue to expected status string
+    const statusValue = inputValue === 1 ? "active" : "banned";
+    
+    try {
+      const response = await putChangeUserStatus({
+        id: value.id,
+        data: { status: statusValue, _method: "PUT" },
+      }).unwrap();
+      console.log("User status updated:", response.message);
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      if (error?.data) {
+        console.error("Error response data:", error.data);
+      }
+    }
   };
 
   return (
@@ -65,65 +78,34 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       open={openModel}
       onCancel={hideModal}
       footer={null}
-      bodyStyle={{
+      style={{
         backgroundColor: "white",
         padding: "20px",
         textAlign: "center",
       }}
-      style={{
-        top: "35%", // Flexbox to center
-        left: "35%",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        position: "fixed",
-      }}
-      closable={false}
-      centered={true} // Use Ant Design's centered property
+      centered={true}
     >
       <div className="text-center mb-4">
         <h1 className="text-xl font-bold text-black">{title}</h1>
         <h2 className="text-lg text-gray-600">{subtitle}</h2>
       </div>
 
-      {/* Conditionally display the role selection */}
       {showRoleSelect && setRole && (
         <div className="mb-4 py-6 flex-col">
-          <Radio.Group onChange={onChange} inputvalue={value}>
-            <Space className="text-start" direction="vertical">
-              <Radio value={1}>Admin</Radio>
-              <Radio value={2}>Member</Radio>
-              <Radio value={3}>Block</Radio>
-              {/* <Radio value={4}>
-          More...
-          {value === 4 ? <Input style={{ width: 100, marginInlineStart: 10 }} /> : null}
-        </Radio> */}
+          <Radio.Group onChange={onChange} value={inputValue}>
+            <Space direction="vertical">
+              <Radio value={1}>Active</Radio>
+              <Radio value={2}>Banned</Radio>
             </Space>
           </Radio.Group>
-          {/* <Select
-            value={role}
-            onChange={(value) => setRole(value)}
-            style={{ width: 200 }}
-          >
-            <Option value="Admin">Admin</Option>
-            <Option value="Member">Member</Option>
-            <Option value="Block">Block</Option>
-          </Select> */}
         </div>
       )}
 
-      {/* Display specific properties of the userData */}
       {value && (
         <div className="mb-4">
-          <p>
-            <strong>Name:</strong> {value.name}
-          </p>
-          <p>
-            <strong>Date of Birth:</strong> {value.dateOfBirth}
-          </p>
-          <p>
-            <strong>Contact:</strong> {value.contact}
-          </p>
+          <p><strong>Name:</strong> {value.full_name}</p>
+          <p><strong>Email:</strong> {value.email}</p>
+          <p><strong>Status:</strong> {value.status}</p>
         </div>
       )}
 

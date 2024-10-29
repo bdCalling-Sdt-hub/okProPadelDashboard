@@ -2,8 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Dashboard from "../layout/dashboard/Dashboard";
 import React from "react";
 import DasboardHome from "../pages/DasboardHome";
-import ProductListing from "../pages/ProductListing";
-import Category_Management from "../pages/Category_Management";
+import Request from "../pages/Request";
 import Manage_Users from "../pages/Manage_Users";
 import Love from "../pages/Love";
 import Transactions from "../pages/Transactions";
@@ -20,6 +19,9 @@ import SettingsFaq from "../pages/SettingsFaq";
 import SettingsTermsAndConditions from "../pages/SettingsTermsAndConditions";
 import EditTermsAndCondition from "../pages/EditTermsAndConditions";
 import Questionaries from "../pages/Questionaries";
+import Club from './../pages/Club';
+import Volunteer from "../pages/Volunteer";
+import Profile from "../pages/Profile";
 
 
 
@@ -38,16 +40,20 @@ const router = createBrowserRouter([
                 element: <DasboardHome />,
             },
             {
+                path: "/club",
+                element: <Club />,
+            },
+            {
                 path: "/notifications",
                 element: <Notifications />,
             },
             {
-                path: "/productListing",
-                element: <ProductListing />,
+                path: "/request",
+                element: <Request />,
             },
             {
-                path: "/category_management",
-                element: <Category_Management />,
+                path: "/volunteer",
+                element: <Volunteer />
             },
             {
                 path: "/manage-users",
@@ -88,6 +94,10 @@ const router = createBrowserRouter([
             {
                 path: "settings/termsAndCondition/edittermsAndConditions",
                 element: <EditTermsAndCondition />
+            },
+            {
+                path: "profile",
+                element: <Profile />
             },
         ]
     },

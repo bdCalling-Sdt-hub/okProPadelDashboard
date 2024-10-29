@@ -221,7 +221,7 @@ border-color: transparent !important;
 .auth-wrapper {
   width: 100%;
   height: 100vh;
-  background: linear-gradient(#2e2d2dc0, #2e2d2dd2), url("./assets/bg.png");
+  /* background: linear-gradient(#2e2d2dc0, #2e2d2dd2), url("./assets/bg.png"); */
   background-repeat: no-repeat;
   background-size: cover;
 }

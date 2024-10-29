@@ -24,9 +24,9 @@ interface UserData {
   action: UserAction;
 }
 
-interface ProductListingProps {}
+interface RequestProps {}
 
-const TransactionTable: React.FC<ProductListingProps> = () => {
+const TransactionTable: React.FC<RequestProps> = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModel, setOpenModel] = useState<boolean>(false);
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);

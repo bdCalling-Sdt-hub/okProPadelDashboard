@@ -28,9 +28,9 @@ interface UserData {
   action: UserAction;
 }
 
-interface ProductListingProps {}
+interface RequestProps {}
 
-const ProductListing: React.FC<ProductListingProps> = () => {
+const Request: React.FC<RequestProps> = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModel, setOpenModel] = useState<boolean>(false);
   const [openTrialModal, setOpenTrialModal] = useState<boolean>(false);
@@ -223,4 +223,4 @@ const ProductListing: React.FC<ProductListingProps> = () => {
   );
 };
 
-export default ProductListing;
+export default Request;

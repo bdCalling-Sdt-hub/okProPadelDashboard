@@ -4,21 +4,28 @@ import { Bell, Lock, LogOut, User, User2Icon } from "lucide-react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/Images/LogoOkProPadel.png";
 import logoChoozy from "../../assets/Images/dashboard/pie-chart.svg";
-import productListing from "../../assets/Images/dashboard/prodcutListing.svg";
-import productListing1 from "../../assets/Images/dashboard/productlisting1.svg";
+import Request from "../../assets/Images/dashboard/prodcutListing.svg";
+import Request1 from "../../assets/Images/dashboard/productlisting1.svg";
 import categoryManagement from "../../assets/Images/dashboard/categoryManagement1.svg";
 import categoryManagement1 from "../../assets/Images/dashboard/categoryManagement1.svg";
 import transaction1 from "../../assets/Images/dashboard/transactiopns1.svg";
 import transaction from "../../assets/Images/dashboard/transaction.svg";
-import { FaRegUserCircle, FaRegHeart, FaChartPie, FaUserCircle, FaLock, FaHeart } from "react-icons/fa";
+import {
+  FaRegUserCircle,
+  FaRegHeart,
+  FaChartPie,
+  FaUserCircle,
+  FaLock,
+  FaHeart,
+} from "react-icons/fa";
 import { CiCreditCard1 } from "react-icons/ci";
-import settings from "../../assets/Images/dashboard/settings.svg";
+import settings from "../../assets/Images/dashboard/Settings.svg";
 import SubMenu from "antd/es/menu/SubMenu";
 import "./Styled_components.css";
 import { BiPieChartAlt2 } from "react-icons/bi";
 import { IoIosCard } from "react-icons/io";
 import Questionaries from "../../assets/Images/dashboard/questionaries.svg";
-
+import { BsMicrosoftTeams } from "react-icons/bs";
 
 const { Header, Sider, Content } = Layout;
 
@@ -42,26 +49,63 @@ const menuItems: MenuItem[] = [
     title: "Manage Users",
     icon: <FaRegUserCircle size={18} color="white" />,
     activeIcon: <FaUserCircle size={18} color="white" />,
-
   },
   {
-    path: "/productListing",
+    path: "/club",
+    title: "Clubs",
+    icon: <BsMicrosoftTeams size={18} color="white" />,
+    activeIcon: <BsMicrosoftTeams size={18} color="white" />,
+  },
+  {
+    path: "/request",
     title: "Request",
-    icon: <img src={productListing} alt="Logo" width={18} height={18} />,
-    activeIcon: <img src={productListing1} alt="Logo" width={18} height={18}  />,
+    icon: <img src={Request} alt="Logo" width={18} height={18} />,
+    activeIcon: <img src={Request1} alt="Logo" width={18} height={18} />,
   },
   {
-    path: "/category_management",
+    path: "/volunteer",
     title: "Volunteer",
-    icon: <img src={categoryManagement} alt="Logo" width={18} height={18} color="white" />,
-    activeIcon: <img src={categoryManagement1} alt="Logo" width={18} height={18} color="white" />,
+    icon: (
+      <img
+        src={categoryManagement}
+        alt="Logo"
+        width={18}
+        height={18}
+        color="white"
+      />
+    ),
+    activeIcon: (
+      <img
+        src={categoryManagement1}
+        alt="Logo"
+        width={18}
+        height={18}
+        color="white"
+      />
+    ),
   },
- 
+
   {
     path: "/questionaries",
     title: "Questionaries",
-    icon: <img src={Questionaries} alt="Logo" width={18} height={18} color="white" />,
-    activeIcon: <img src={Questionaries} alt="Logo" width={18} height={18} color="white" />,
+    icon: (
+      <img
+        src={Questionaries}
+        alt="Logo"
+        width={18}
+        height={18}
+        color="white"
+      />
+    ),
+    activeIcon: (
+      <img
+        src={Questionaries}
+        alt="Logo"
+        width={18}
+        height={18}
+        color="white"
+      />
+    ),
   },
   // {
   //   path: "/transactions",
@@ -72,8 +116,19 @@ const menuItems: MenuItem[] = [
   {
     path: "/settings",
     title: "Settings",
-    icon: <img src={settings} alt="Logo" width={18} height={18} color="white" />,
-    activeIcon: <img src={settings} alt="Logo" width={18} height={18} color="white" style={{ filter: "invert(1)" }} />,
+    icon: (
+      <img src={settings} alt="Logo" width={18} height={18} color="white" />
+    ),
+    activeIcon: (
+      <img
+        src={settings}
+        alt="Logo"
+        width={18}
+        height={18}
+        color="white"
+        style={{ filter: "invert(1)" }}
+      />
+    ),
     children: [
       {
         path: "/settings/personalInformation",
@@ -132,18 +187,34 @@ const Dashboard: React.FC = () => {
             <span className="text-[#B0B0B0]">Hello,</span> Maria 👋
           </h1>
         );
-      case "/productListing":
-        return <h1 className="text-[#333333] font-bold text-[24px]">Request</h1>;
-      case "/category_management":
-        return <h1 className="text-[#333333] font-bold text-[24px]">Volunteer</h1>;
+      case "/club":
+        return <h1 className="text-[#333333] font-bold text-[24px]">Clubs</h1>;
+      case "/request":
+        return (
+          <h1 className="text-[#333333] font-bold text-[24px]">Request</h1>
+        );
+      case "/volunteer":
+        return (
+          <h1 className="text-[#333333] font-bold text-[24px]">Volunteer</h1>
+        );
       case "/manage-users":
-        return <h1 className="text-[#333333] font-bold text-[24px]">Manage Users</h1>;
+        return (
+          <h1 className="text-[#333333] font-bold text-[24px]">Manage Users</h1>
+        );
       case "/questionaries":
-        return <h1 className="text-[#333333] font-bold text-[24px]">Questionaries</h1>;
+        return (
+          <h1 className="text-[#333333] font-bold text-[24px]">
+            Questionaries
+          </h1>
+        );
       case "/transactions":
-        return <h1 className="text-[#333333] font-bold text-[24px]">Transactions</h1>;
+        return (
+          <h1 className="text-[#333333] font-bold text-[24px]">Transactions</h1>
+        );
       case "/settings":
-        return <h1 className="text-[#333333] font-bold text-[24px]">Settings</h1>;
+        return (
+          <h1 className="text-[#333333] font-bold text-[24px]">Settings</h1>
+        );
       default:
         return (
           <h1 className="text-[#333333] font-bold text-[24px]">
@@ -152,7 +223,11 @@ const Dashboard: React.FC = () => {
         );
     }
   };
-  const getMenuIcon = (icon: React.ReactNode, activeIcon: React.ReactNode, isActive: boolean) => {
+  const getMenuIcon = (
+    icon: React.ReactNode,
+    activeIcon: React.ReactNode,
+    isActive: boolean
+  ) => {
     return isActive ? activeIcon : icon;
   };
 
@@ -168,75 +243,107 @@ const Dashboard: React.FC = () => {
           bottom: 0,
           overflow: "auto",
           zIndex: 2,
-        
         }}
         trigger={null}
       >
-       <div className="flex items-center gap-4">
-       <img src={logo} alt="Logo" className="ml-6 py-6 w-[31px]" />
-       <h1 className="text-xl text-white font-bold">OkProPadel</h1>
-       </div>
-        <Menu mode="inline" style={{ background: "#1E1E1E", color: "white" }} defaultSelectedKeys={["1"]}>
-          {menuItems.map((item, index) => {
-            const isActive = location.pathname === item.path;
-            if (item.children) {
-              return (
-                <SubMenu
-                  key={`submenu-${index}`}
-                  title={item.title}
-                  icon={getMenuIcon(item.icon, item.activeIcon, isActive)}
-                  style={{
-                    color: isActive ? "red" : "#fff",
-                    fontWeight: isActive ? "bold" : "normal",
-                    fontSize: "16px",
-                    marginBottom: "10px",
-                    backgroundColor: isActive ? "gray" : "transparent",
-                  }}
-                >
-                  {item.children.map((child, childIndex) => (
-                    <Menu.Item
-                      key={`child-${childIndex}`}
-                      icon={getMenuIcon(child.icon, child.activeIcon, location.pathname === child.path)}
+        <div className="flex items-center gap-4">
+          <img src={logo} alt="Logo" className="ml-6 py-6 w-[31px]" />
+          <h1 className="text-xl text-white font-bold">OkProPadel</h1>
+        </div>
+        <Menu
+          mode="inline"
+          style={{ background: "#1E1E1E", color: "white" }}
+          // defaultSelectedKeys={["1"]}
+          selectedKeys={[location.pathname]}
+        >
+          <div className="flex flex-col justify-between h-[90vh]">
+            <div className="px-4">
+              {menuItems.map((item, index) => {
+                const isActive = location.pathname === item.path;
+                if (item.children) {
+                  return (
+                    <SubMenu
+                      key={`submenu-${index}`}
+                      title={item.title}
+                      icon={getMenuIcon(item.icon, item.activeIcon, isActive)}
                       style={{
-                        color: location.pathname === child.path ? "red" : "#fff",
-                        fontWeight: location.pathname === child.path ? "bold" : "normal",
+                        color: isActive ? "red" : "#fff",
+                        fontWeight: isActive ? "bold" : "normal",
                         fontSize: "16px",
+                        marginBottom: "10px",
+                        backgroundColor: isActive ? "gray" : "transparent",
                       }}
                     >
-                      <Link to={child.path}>{child.title}</Link>
+                      {item.children.map((child, childIndex) => (
+                        <Menu.Item
+                          key={child.path}
+                          icon={getMenuIcon(
+                            child.icon,
+                            child.activeIcon,
+                            location.pathname === child.path
+                          )}
+                          style={{
+                            color:
+                              location.pathname === child.path ? "red" : "#fff",
+                            fontWeight:
+                              location.pathname === child.path
+                                ? "bold"
+                                : "normal",
+                            fontSize: "16px",
+                          }}
+                        >
+                          <Link to={child.path}>{child.title}</Link>
+                        </Menu.Item>
+                      ))}
+                    </SubMenu>
+                  );
+                } else {
+                  return (
+                    <Menu.Item
+                      key={`item-${index}`}
+                      icon={getMenuIcon(item.icon, item.activeIcon, isActive)}
+                      style={{
+                        color: isActive ? "red" : "#fff",
+                        fontWeight: isActive ? "bold" : "normal",
+                        fontSize: "16px",
+                        marginBottom: "10px",
+                        backgroundColor: isActive ? "gray" : "transparent",
+                      }}
+                    >
+                      <Link to={item.path}>{item.title}</Link>
                     </Menu.Item>
-                  ))}
-                </SubMenu>
-              );
-            } else {
-              return (
-                <Menu.Item
-                  key={`item-${index}`}
-                        icon={getMenuIcon(item.icon, item.activeIcon, isActive)}
-                  style={{
-                    color: isActive ? "red" : "#fff",
-                    fontWeight: isActive ? "bold" : "normal",
-                    fontSize: "16px",
-                    marginBottom: "10px",
-                    backgroundColor: isActive ? "gray" : "transparent",
-                  }}
-                >
-                  <Link to={item.path}>{item.title}</Link>
-                </Menu.Item>
-              );
-            }
-          })}
-          <div className="flex py-36 gap-8 mt-16 px-4 w-full">
-            <div className="flex gap-2 w-3/4 items-center">
-              <Popover className="cursor-pointer" placement="top" content={content}>
-                <Avatar style={{ width: "40px", height: "40px", backgroundColor: "gray" }} icon={<User size={25} />} />
-              </Popover>
-              <div className="space-y-4">
-                <h1 className="text-white">Maria</h1>
-                <h1 className="text-white">ex@ample.com</h1>
-              </div>
+                  );
+                }
+              })}
             </div>
-            <Menu.Item key="500" icon={<LogOut size={20} />} style={{ color: "red", fontSize: "16px" }} onClick={handleLogout} />
+            <div className="flex py-12 gap-8 mt-16 px-4 w-full">
+              <div className="flex gap-2 w-3/4 items-center">
+                <Popover
+                  className="cursor-pointer"
+                  placement="top"
+                  content={content}
+                >
+                  <Avatar
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      backgroundColor: "gray",
+                    }}
+                    icon={<User size={25} />}
+                  />
+                </Popover>
+                <div className="space-y-4">
+                  <h1 className="text-white">Maria</h1>
+                  <h1 className="text-white">ex@ample.com</h1>
+                </div>
+              </div>
+              <Menu.Item
+                key="500"
+                icon={<LogOut size={20} />}
+                style={{ color: "red", fontSize: "16px" }}
+                onClick={handleLogout}
+              />
+            </div>
           </div>
         </Menu>
       </Sider>
@@ -259,7 +366,11 @@ const Dashboard: React.FC = () => {
         >
           <div className="w-full flex justify-between">
             <div>{getTitle()}</div>
-            <div onClick={handleNotifications} className="cursor-pointer" style={{ zIndex: 11 }}>
+            <div
+              onClick={handleNotifications}
+              className="cursor-pointer"
+              style={{ zIndex: 11 }}
+            >
               <Badge count={5}>
                 <Bell size={30} color="gray" />
               </Badge>

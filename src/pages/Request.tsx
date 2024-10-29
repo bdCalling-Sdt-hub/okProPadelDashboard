@@ -1,8 +1,8 @@
 import { Input, Table, Select, Modal, DatePicker, TimePicker, Button } from "antd";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
-import ModalComponent from "../component/share/ModalComponent";
 import moment from 'moment';
+import { useGetAllRequestQuery } from "../redux/features/getAllRequestApi";
 
 const { Option } = Select;
 
@@ -24,44 +24,42 @@ interface UserData {
   status: string;
   currentLevel: string;
   requestedLevel: string;
-  role: string;
+  club: { id: number; club_name: string }[] | undefined;
   action: UserAction;
 }
 
-interface ProductListingProps {}
-
-const CategoryManagement: React.FC<ProductListingProps> = () => {
+const Request: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [openModel, setOpenModel] = useState<boolean>(false);
   const [openTrialModal, setOpenTrialModal] = useState<boolean>(false);
-  const [userData, setUserData] = useState<UserAction>({} as UserAction);
-  const [selectedroles, setSelectedroles] = useState<{ [key: number]: string }>({});
   const [trialMatchData, setTrialMatchData] = useState<UserData | null>(null);
+  const [selectedClubs, setSelectedClubs] = useState<{ [key: number]: number }>({});
   const [selectedTeam, setSelectedTeam] = useState<number[]>([]);
   const [selectedOpponents, setSelectedOpponents] = useState<number[]>([]);
+  const { data: requestMatch, isLoading, isError } = useGetAllRequestQuery();
 
   const pageSize = 10;
 
-  const role = ["02 (Lower-Intermediate", "03 (Lower-Intermediate", "4 (Advanced)", "05 (Professional)"];
-
-  const data: UserData[] = [...Array(9).keys()].map((item, index) => ({
-    sId: index + 1,
-    name: `Player ${index + 1}`,
-    location: "New York, USA",
-    email: "maria@X.com",
-    currentLevel: "2",
-    requestedLevel: "3",
-    role: selectedroles[index + 1] || '04 (Advanced)',
+  // Use optional chaining and default empty array to handle undefined data
+  const dataSource = requestMatch?.data?.map((item, index) => ({
+    sId: item.request_id,
+    name: item?.user?.full_name,
+    location: item?.user?.location,
+    currentLevel: item?.user?.current_level,
+    requestedLevel: item?.request_level,
+    club: item?.club || [],  // Default to empty array if club is undefined
     status: "Approved",
     action: {
-      sId: index + 1,
-      name: `Player ${index + 1}`,
+      sId: item.request_id,
+      name: item?.user?.full_name,
+      currentLevel: item?.user?.current_level,
+      requestedLevel: item?.request_level,
+      club: item?.club || [],  // Default to empty array if club is undefined
       email: `player${index + 1}@example.com`,
       status: "Approved",
       dateOfBirth: "24-05-2024",
       contact: "0521545861520",
     },
-  }));
+  })) || [];  // Default to empty array if requestMatch.data is undefined
 
   const columns = [
     {
@@ -70,71 +68,69 @@ const CategoryManagement: React.FC<ProductListingProps> = () => {
       key: "name",
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
       title: "Location",
       dataIndex: "location",
       key: "location",
     },
-    
     {
       title: "Current Level",
       dataIndex: "currentLevel",
       key: "currentLevel",
     },
-    
     {
-      title: "Role",
-      dataIndex: "role",
-      key: "role",
-      render: (_: any, record: UserData) => (
+      title: "Requested Level",
+      dataIndex: "requestedLevel",
+      key: "requestedLevel",
+    },
+    {
+      title: "Club",
+      dataIndex: "club",
+      key: "club",
+      render: (_, record) => (
         <Select
-          defaultValue={record.role}
-          style={{ width: 220 }}
-          onChange={(value) => handleroleChange(record.sId, value)}
+          defaultValue={record.club?.[0]?.id}
+          style={{ width: 120 }}
+          onChange={(value) => handleClubChange(record.sId, value)}
           dropdownRender={(menu) => (
             <div style={{ maxHeight: 150, overflowY: 'auto' }}>
               {menu}
             </div>
           )}
         >
-          {role.map((role) => (
-            <Option key={role} value={role}>
-              {role}
+          {record.club?.map((club) => (
+            <Option key={club.id} value={club.id}>
+              {club.club_name}
             </Option>
           ))}
         </Select>
       ),
     },
-    // {
-    //   title: "Trial Matches",
-    //   dataIndex: "trialMatches",
-    //   key: "trialMatches",
-    //   render: (_: any, record: UserData) => (
-    //     <button
-    //       onClick={() => handleTrialMatches(record)}
-    //       className="text-[#00BCE6] px-3"
-    //     >
-    //       Set Up
-    //     </button>
-    //   ),
-    // },
+    {
+      title: "Trial Matches",
+      dataIndex: "trialMatches",
+      key: "trialMatches",
+      render: (_, record) => (
+        <button
+          onClick={() => handleTrialMatches(record)}
+          className="text-[#00BCE6] px-3"
+        >
+          Set Up
+        </button>
+      ),
+    },
   ];
 
   const handlePage = (page: number) => {
     setCurrentPage(page);
   };
 
-  const handleroleChange = (sId: number, value: string) => {
-    setSelectedroles((prev) => ({ ...prev, [sId]: value }));
+  const handleClubChange = (sId: number, value: number) => {
+    setSelectedClubs((prev) => ({ ...prev, [sId]: value }));
   };
 
   const handleTrialMatches = (record: UserData) => {
-    setTrialMatchData(record);  // Set the data for the modal
-    setOpenTrialModal(true);  // Open the trial match modal
+    setTrialMatchData(record);
+    setOpenTrialModal(true);
   };
 
   const confirmTrialMatch = () => {
@@ -151,22 +147,20 @@ const CategoryManagement: React.FC<ProductListingProps> = () => {
           prefix={<Search />}
           className="w-full rounded-2xl h-12 bg-base border-0 text-primary placeholder:text-gray-200"
           placeholder="Search for Listing"
-          style={{
-            backgroundColor: "#f0f0f0",
-            color: "#333333",
-          }}
+          style={{ backgroundColor: "#f0f0f0", color: "#333333" }}
         />
       </div>
       <div className="py-8">
         <Table
-          dataSource={data}
+          dataSource={dataSource}
           columns={columns}
           pagination={{
             pageSize,
-            total: 50,
+            total: requestMatch?.data?.length || 0,
             current: currentPage,
             onChange: handlePage,
           }}
+          rowKey="sId"
           rowClassName={() => "hover:bg-transparent"}
         />
 
@@ -192,7 +186,7 @@ const CategoryManagement: React.FC<ProductListingProps> = () => {
               placeholder="Select Team"
               onChange={(values) => setSelectedTeam(values)}
             >
-              {data.map((player) => (
+              {dataSource.map((player) => (
                 <Option key={player.sId} value={player.sId}>
                   {player.name}
                 </Option>
@@ -206,7 +200,7 @@ const CategoryManagement: React.FC<ProductListingProps> = () => {
               placeholder="Select Opponents"
               onChange={(values) => setSelectedOpponents(values)}
             >
-              {data.map((player) => (
+              {dataSource.map((player) => (
                 <Option key={player.sId} value={player.sId}>
                   {player.name}
                 </Option>
@@ -217,8 +211,18 @@ const CategoryManagement: React.FC<ProductListingProps> = () => {
             <TimePicker style={{ width: '100%' }} defaultValue={moment('12:08', 'HH:mm')} />
             <DatePicker style={{ width: '100%', marginTop: 10 }} />
 
-            <h3>role</h3>
-            <div>{trialMatchData?.role}</div>
+            <h3>Club</h3>
+            <Select
+              defaultValue={trialMatchData?.club?.[0]?.id}
+              style={{ width: '100%' }}
+              onChange={(value) => handleClubChange(trialMatchData?.sId || 0, value)}
+            >
+              {trialMatchData?.club?.map((club) => (
+                <Option key={club.id} value={club.id}>
+                  {club.club_name}
+                </Option>
+              ))}
+            </Select>
           </div>
         </Modal>
       </div>
@@ -226,4 +230,4 @@ const CategoryManagement: React.FC<ProductListingProps> = () => {
   );
 };
 
-export default CategoryManagement;
+export default Request;
