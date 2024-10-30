@@ -155,6 +155,13 @@ const Volunteer: React.FC = () => {
             >
               <Input placeholder="Enter location" />
             </Form.Item>
+            <Form.Item
+              name="phonNumber"
+              label="Phone Number"
+              rules={[{ required: true, message: "Please enter the location" }]}
+            >
+              <Input placeholder="Enter location" />
+            </Form.Item>
 
             <Form.Item
               name="level"
@@ -176,6 +183,14 @@ const Volunteer: React.FC = () => {
                   </Option>
                 ))}
               </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="status"
+              label="Status"
+              rules={[{ required: true, message: "Please enter the current level" }]}
+            >
+              <Input placeholder="Enter current level" />
             </Form.Item>
 
             <Form.Item>

@@ -3,7 +3,8 @@ import { Upload, Input, Button, Form, message } from 'antd';
 import type { UploadFile, UploadProps, FormProps } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { useGetPersonalInformationQuery } from "../redux/features/getPersonalInformation";
+import { useGetPersonalInformationQuery } from '../redux/features/getPersonalInformationApi';
+
 
 type FileType = Exclude<Parameters<UploadProps['beforeUpload']>[0], undefined>;
 
@@ -23,7 +24,7 @@ const Settings_personalInformation: React.FC = () => {
 
   // Fetch personal information data
   const { data, isLoading, isError } = useGetPersonalInformationQuery();
-
+console.log("27",data?.data);
   useEffect(() => {
     if (data && data.data) {
       console.log("Fetched data:", data); // Debugging check for fetched data
@@ -100,6 +101,7 @@ const Settings_personalInformation: React.FC = () => {
         {!fileList.length && previewImage && (
           <img src={previewImage} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
         )}
+        <h1>Name:</h1>
       </div>
 
       <Form
@@ -116,7 +118,7 @@ const Settings_personalInformation: React.FC = () => {
           label="Email"
           rules={[{ required: true, message: 'Please input your email!' }]}
         >
-          <Input placeholder='Email' className='h-12' />
+          <Input placeholder={data?.data?.email} className='h-12' />
         </Form.Item>
 
         <Form.Item<FieldType>
