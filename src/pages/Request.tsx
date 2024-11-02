@@ -48,6 +48,7 @@ const Request: React.FC = () => {
   );
   const [selectedTeam, setSelectedTeam] = useState<number[]>([]);
   const [selectedOpponents, setSelectedOpponents] = useState<number[]>([]);
+  console.log("51", selectedOpponents);
 
   // Fetching data with loading checks
   const { data: requestMatch, isLoading, isError } = useGetAllRequestQuery();
@@ -70,7 +71,7 @@ const Request: React.FC = () => {
       currentLevel: item?.user?.current_level,
       requestedLevel: item?.request_level,
       club: item?.club || [], // Default to empty array if club is undefined
-      status: "Approved",
+      status: item?.status,
       action: {
         sId: item.request_id,
         name: item?.user?.full_name,
@@ -78,7 +79,7 @@ const Request: React.FC = () => {
         requestedLevel: item?.request_level,
         club: item?.club || [], // Default to empty array if club is undefined
         email: `player${index + 1}@example.com`,
-        status: "Approved",
+        status: item?.status,
         dateOfBirth: "24-05-2024",
         contact: "0521545861520",
       },
@@ -104,6 +105,11 @@ const Request: React.FC = () => {
       title: "Requested Level",
       dataIndex: "requestedLevel",
       key: "requestedLevel",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
     },
     {
       title: "Trial Matches",
@@ -142,37 +148,38 @@ const Request: React.FC = () => {
 
   const confirmTrialMatch = async () => {
     if (trialMatchData) {
-      const postData = {
-        user_id: trialMatchData.sId,
-        club_id: selectedClubs[trialMatchData.sId] || trialMatchData.club?.[0]?.id,
-        volunteer_id: selectedTeam,
-        time: moment().format("HH:mm"),
-        date: moment().format("YYYY-MM-DD"),
-      };
-  
-      try {
-        const result = await postSetupTrialMatch(postData).unwrap();
-        console.log("Trial match created successfully:", result);
-        setOpenTrialModal(false); 
-      } catch (error) {
-        if (error.originalStatus === 200 && error.status === "PARSING_ERROR") {
-          console.error("The server returned an unexpected HTML response:", error);
-        } else {
-          console.error("Error setting up trial match:", error);
+      const id = trialMatchData.sId;
+        console.log("146, Selected Opponents before posting:", selectedOpponents); // Debugging step
+        const postData = {
+            user_id: trialMatchData.sId,
+            club_id: selectedClubs[trialMatchData.sId] || trialMatchData.club?.[0]?.id,
+            volunteer_ids: selectedOpponents?.length > 0 ? selectedOpponents : [], // Ensure it's an array
+            time: moment().format("HH:mm"),
+            date: moment().format("YYYY-MM-DD"),
+        };
+        
+        console.log("Post data being sent:", postData); // Debugging log for post data
+        try {
+            const result = await postSetupTrialMatch({id, data: postData}).unwrap();
+            console.log("Trial match created successfully:", result);
+            setOpenTrialModal(false); 
+        } catch (error) {
+            console.error("Error setting up trial match:", error);
         }
-      }
     }
-  };
-
+};
   return (
     <div className="py-4">
-      <div>
+      <div className="flex justify-between">
         <Input
           prefix={<Search />}
-          className="w-full rounded-2xl h-12 bg-base border-0 text-primary placeholder:text-gray-200"
+          className="w-[50%] rounded-2xl h-12 bg-base border-0 text-primary placeholder:text-gray-200"
           placeholder="Search for Listing"
           style={{ backgroundColor: "#f0f0f0", color: "#333333" }}
         />
+         {/* <Button key="cancel" onClick={ sesTrialMatch}>
+              See Trial Match
+            </Button> */}
       </div>
       <div className="py-8">
         <Table

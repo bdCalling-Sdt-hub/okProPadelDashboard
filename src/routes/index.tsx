@@ -22,6 +22,7 @@ import Questionaries from "../pages/Questionaries";
 import Club from './../pages/Club';
 import Volunteer from "../pages/Volunteer";
 import Profile from "../pages/Profile";
+import SeeSetupTrialMatch from "../pages/SeeSetupTrialMatch";
 
 
 
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
             {
                 path: "/request",
                 element: <Request />,
+            },
+            {
+                path: "/seeTrialMatch",
+                element: <SeeSetupTrialMatch />
             },
             {
                 path: "/volunteer",

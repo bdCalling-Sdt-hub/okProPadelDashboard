@@ -5,7 +5,7 @@ const getAllRequestApi = baseApi.injectEndpoints({
     endpoints:(builder) => ({
         getAllRequest:builder.query({
             query:() => `/request-match`,
-            providesTags: ["Users"],
+            providesTags: ["Request"],
         })
     })
 })

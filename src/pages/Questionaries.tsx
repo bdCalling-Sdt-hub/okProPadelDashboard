@@ -1,130 +1,189 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Collapse, Input, Button } from "antd";
 import type { CollapseProps } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useUpdateNormalMatchQuestionMutation } from "../redux/features/putUpdateNormalMatchQuestion";
+import { useUpdateTrialMatchQuestionMutation } from "../redux/features/putUpdateTrialMatchQuestion";
+import { useDeleteNormalMatchQuestionMutation } from "../redux/features/deleteNormalMatchQuestion";
+import { useAddNormalMatchQuestionMutation } from "../redux/features/postAddNormalMatchQuestionApi";
+import { useGetNormalMatchQuestionQuery } from "../redux/features/getNormalMatchQuestionApi";
+
+
+interface MatchData {
+  [key: string]: {
+    label: string;
+    content: string;
+    answers: string[];
+  };
+}
 
 const Questionaries: React.FC = () => {
-  // Separate state for normal matches and trial matches panel data
-  const [normalMatchData, setNormalMatchData] = useState({
-    1: {
-      label: "This is panel header 1",
-      content:
-        "A dog is a type of domesticated animal. Known for its loyalty and faithfulness, it can be found as a welcome guest in many households across the world.",
-    },
-  });
-
-  const [trialMatchData, setTrialMatchData] = useState({
-    1: {
-      label: "This is panel header 1 for trial match",
-      content:
-        "Cats are known for their independence, but they are also great companions for people who like more relaxed pets.",
-    },
-  });
-
-  // State to manage which panel is being edited (for both label and content)
+  const [normalMatchData, setNormalMatchData] = useState<MatchData>(
+    JSON.parse(localStorage.getItem("normalMatchData") || "{}")
+  );
+  const [trialMatchData, setTrialMatchData] = useState<MatchData>(
+    JSON.parse(localStorage.getItem("trialMatchData") || "{}")
+  );
   const [editingPanel, setEditingPanel] = useState<string | null>(null);
-
-  // State to manage temporary content and label when editing
   const [tempContent, setTempContent] = useState<string>("");
   const [tempLabel, setTempLabel] = useState<string>("");
+  const [tempAnswers, setTempAnswers] = useState<string[]>(["", "", "", ""]);
+  const [updateNormalMatchQuestion] = useUpdateNormalMatchQuestionMutation();
+  const [updateTrialMatchQuestion] = useUpdateTrialMatchQuestionMutation();
+  const [deleteNormalMatchQuestion] = useDeleteNormalMatchQuestionMutation();
+  const [addNormalMatchQuestion] = useAddNormalMatchQuestionMutation();
+  const {data} = useGetNormalMatchQuestionQuery()
+console.log("34", data?.data?.data?.[0]?.id);
+  useEffect(() => {
+    localStorage.setItem("normalMatchData", JSON.stringify(normalMatchData));
+  }, [normalMatchData]);
 
-  // Handle panel change (accordion open/close event)
-  const onChange = (key: string | string[]) => {
-    console.log("Accordion panels changed: ", key);
-  };
+  useEffect(() => {
+    localStorage.setItem("trialMatchData", JSON.stringify(trialMatchData));
+  }, [trialMatchData]);
 
-  // Enter edit mode for both label and content
   const handleEdit = (key: string, dataType: "normal" | "trial") => {
+    console.log("43", key);
     setEditingPanel(key);
     const dataToEdit = dataType === "normal" ? normalMatchData : trialMatchData;
-    setTempLabel(dataToEdit[key as keyof typeof dataToEdit].label); // Load the current label
-    setTempContent(dataToEdit[key as keyof typeof dataToEdit].content); // Load the current content
+    setTempLabel(dataToEdit[key].label);
+    setTempContent(dataToEdit[key].content);
+    setTempAnswers(dataToEdit[key].answers || ["", "", "", ""]);
   };
 
-  // Save the edited label and content
-  const handleSave = (key: string, dataType: "normal" | "trial") => {
-    // Update the correct state (normal matches or trial matches)
-    if (dataType === "normal") {
-      setNormalMatchData((prevState) => ({
-        ...prevState,
-        [key]: {
-          label: tempLabel,
-          content: tempContent,
-        },
-      }));
-    } else {
-      setTrialMatchData((prevState) => ({
-        ...prevState,
-        [key]: {
-          label: tempLabel,
-          content: tempContent,
-        },
-      }));
+  const handleSave = async (key: string | null, dataType: "normal" | "trial") => {
+    // Validate that all answer fields are filled
+    if (tempAnswers.some((answer) => !answer.trim())) {
+      console.error("All answer fields must be filled.");
+      return;
     }
-
-    setEditingPanel(null); // Exit edit mode
+  
+    const updatedData = {
+      label: tempLabel,
+      content: tempContent,
+      answers: tempAnswers,
+    };
+  
+    const formattedQuestion: any = {
+      question: tempLabel,
+      A: tempAnswers[0],
+      B: tempAnswers[1],
+      C: tempAnswers[2],
+      D: tempAnswers[3],
+      status: true,
+    };
+  
+    try {
+      // Check if the key is null or does not exist in normalMatchData
+      if (key || (key in normalMatchData)) {
+        console.log(key);
+        // Add a new question
+        if (dataType === "normal") {
+          console.log("Attempting to add a new normal match question...");
+          const response = await addNormalMatchQuestion(formattedQuestion).unwrap();
+          console.log("API Response:", response);
+          if (response && response.success) {
+            const newKey = `new-${Date.now()}`;
+            setNormalMatchData((prevState) => ({
+              ...prevState,
+              [newKey]: updatedData,
+            }));
+          } else {
+            console.error("Error: Question not added successfully.");
+          }
+        } else {
+          console.log("Add trial match question logic here");
+        }
+      } else {
+        // Updating an existing question
+        formattedQuestion._method = "PUT";
+        if (dataType === "normal") {
+          await updateNormalMatchQuestion({ id: key, data: formattedQuestion }).unwrap();
+          console.log("Normal match question updated successfully.");
+        } else {
+          await updateTrialMatchQuestion({ id: key, data: formattedQuestion }).unwrap();
+          console.log("Trial match question updated successfully.");
+        }
+      }
+    } catch (error) {
+      console.error("Error saving question:", error);
+    }
+  
+    setEditingPanel(null);
   };
+  
 
-  // Cancel editing (reset editing mode)
   const handleCancel = () => {
-    setEditingPanel(null); // Exit edit mode without saving
+    setEditingPanel(null);
   };
 
-  // Add a new panel for normal matches
   const handleAddNewNormalMatch = () => {
-    const newKey = (Object.keys(normalMatchData).length + 1).toString(); // Create a new unique key
+    const newKey = `new-${Date.now()}`;
     const newPanel = {
       [newKey]: {
         label: `This is panel header ${newKey}`,
         content: "This is the new panel content for normal match.",
+        answers: ["", "", "", ""],
       },
     };
 
-    // Add new panel to normalMatchData
     setNormalMatchData((prevState) => ({
       ...prevState,
       ...newPanel,
     }));
   };
 
-  // Add a new panel for trial matches
   const handleAddNewTrialMatch = () => {
-    const newKey = (Object.keys(trialMatchData).length + 1).toString(); // Create a new unique key
+    const newKey = `new-${Date.now()}`;
     const newPanel = {
       [newKey]: {
         label: `This is panel header ${newKey} for trial match`,
         content: "This is the new panel content for trial match.",
+        answers: ["", "", "", ""],
       },
     };
-
-    // Add new panel to trialMatchData
     setTrialMatchData((prevState) => ({
       ...prevState,
       ...newPanel,
     }));
   };
 
-  // Render the Collapse items for normal matches
+  const handleDeletePanel = async (key: string, dataType: "normal" | "trial") => {
+    try {
+      if (dataType === "normal") {
+        // await deleteNormalMatchQuestion({ id: key }).unwrap();
+        const updatedData = { ...normalMatchData };
+        delete updatedData[key];
+        setNormalMatchData(updatedData);
+      } else {
+        const updatedData = { ...trialMatchData };
+        delete updatedData[key];
+        setTrialMatchData(updatedData);
+      }
+    } catch (error) {
+      console.error("Error deleting question:", error);
+    }
+  };
+
+  const handleAnswerChange = (index: number, value: string) => {
+    const updatedAnswers = [...tempAnswers];
+    updatedAnswers[index] = value;
+    setTempAnswers(updatedAnswers);
+  };
+
   const normalMatchItems: CollapseProps["items"] = Object.keys(normalMatchData).map((key) => ({
     key,
     label:
       editingPanel === key ? (
-        <div>
-          <Input
-            value={tempLabel}
-            onChange={(e) => setTempLabel(e.target.value)}
-            placeholder="Edit label"
-          />
-        </div>
+        <Input value={tempLabel} onChange={(e) => setTempLabel(e.target.value)} placeholder="Edit label" />
       ) : (
         <div className="items-center">
-          <span>{normalMatchData[key as keyof typeof normalMatchData].label}</span>
-          <Button
-            onClick={() => handleEdit(key, "normal")}
-            type="link"
-            className="ml-2"
-          >
+          <span>{normalMatchData[key].label}</span>
+          <Button onClick={() => handleEdit(key, "normal")} type="link" className="ml-2">
             Edit
+          </Button>
+          <Button onClick={() => handleDeletePanel(key, "normal")} type="link" danger className="ml-2">
+            Delete
           </Button>
         </div>
       ),
@@ -137,11 +196,16 @@ const Questionaries: React.FC = () => {
             rows={4}
             placeholder="Edit content"
           />
-          <Button
-            onClick={() => handleSave(key, "normal")}
-            type="primary"
-            className="mt-2"
-          >
+          {tempAnswers.map((answer, index) => (
+            <Input
+              key={index}
+              value={answer}
+              onChange={(e) => handleAnswerChange(index, e.target.value)}
+              placeholder={`Answer option ${index + 1}`}
+              className="mt-2"
+            />
+          ))}
+          <Button onClick={() => handleSave(key, "normal")} type="primary" className="mt-2">
             Save
           </Button>
           <Button onClick={handleCancel} className="mt-2 ml-2">
@@ -150,32 +214,27 @@ const Questionaries: React.FC = () => {
         </div>
       ) : (
         <div>
-          <p>{normalMatchData[key as keyof typeof normalMatchData].content}</p>
+          <p>{normalMatchData[key].content}</p>
+          {(normalMatchData[key].answers || []).map((answer, index) => (
+            <p key={index}>{`Answer ${index + 1}: ${answer}`}</p>
+          ))}
         </div>
       ),
   }));
 
-  // Render the Collapse items for trial matches
   const trialMatchItems: CollapseProps["items"] = Object.keys(trialMatchData).map((key) => ({
     key,
     label:
       editingPanel === key ? (
-        <div>
-          <Input
-            value={tempLabel}
-            onChange={(e) => setTempLabel(e.target.value)}
-            placeholder="Edit label"
-          />
-        </div>
+        <Input value={tempLabel} onChange={(e) => setTempLabel(e.target.value)} placeholder="Edit label" />
       ) : (
         <div className="items-center">
-          <span>{trialMatchData[key as keyof typeof trialMatchData].label}</span>
-          <Button
-            onClick={() => handleEdit(key, "trial")}
-            type="link"
-            className="ml-2"
-          >
+          <span>{trialMatchData[key].label}</span>
+          <Button onClick={() => handleEdit(key, "trial")} type="link" className="ml-2">
             Edit
+          </Button>
+          <Button onClick={() => handleDeletePanel(key, "trial")} type="link" danger className="ml-2">
+            Delete
           </Button>
         </div>
       ),
@@ -188,11 +247,16 @@ const Questionaries: React.FC = () => {
             rows={4}
             placeholder="Edit content"
           />
-          <Button
-            onClick={() => handleSave(key, "trial")}
-            type="primary"
-            className="mt-2"
-          >
+          {tempAnswers.map((answer, index) => (
+            <Input
+              key={index}
+              value={answer}
+              onChange={(e) => handleAnswerChange(index, e.target.value)}
+              placeholder={`Answer option ${index + 1}`}
+              className="mt-2"
+            />
+          ))}
+          <Button onClick={() => handleSave(key, "trial")} type="primary" className="mt-2">
             Save
           </Button>
           <Button onClick={handleCancel} className="mt-2 ml-2">
@@ -201,55 +265,43 @@ const Questionaries: React.FC = () => {
         </div>
       ) : (
         <div>
-          <p>{trialMatchData[key as keyof typeof trialMatchData].content}</p>
+          <p>{trialMatchData[key].content}</p>
+          {(trialMatchData[key].answers || []).map((answer, index) => (
+            <p key={index}>{`Answer ${index + 1}: ${answer}`}</p>
+          ))}
         </div>
       ),
   }));
 
   const navigate = useNavigate();
-
   const handleBackSettings = () => {
-    navigate('/settings/personalInformation');
+    navigate("/settings/personalInformation");
   };
 
   return (
-    <div className="flex gap-4">
-      <div className="w-6/12">
-        <div className="flex justify-between py-2">
-          <h1 className="font-bold py-4">Questionaries for normal matches:</h1>
-          <Button
-            onClick={handleAddNewNormalMatch}
-            style={{
-              backgroundColor: "#193664",
-              color: "#fff",
-              height: "56px",
-            }}
-            htmlType="submit"
-            className="w-[100px] h-[56px] py-4 mt-2 text-white hover:border-none border-none rounded-lg"
-          >
-            Add New
-          </Button>
-        </div>
-        <Collapse items={normalMatchItems} defaultActiveKey={["1"]} onChange={onChange} />
+    <div>
+      <div className="py-8">
+        <Button className="" onClick={handleBackSettings} style={{ backgroundColor: "transparent", color: "black" }}>
+          Back
+        </Button>
       </div>
-
-      <div className="w-6/12">
-        <div className="flex justify-between py-2">
-          <h1 className="font-bold py-4">Questionaries for trial matches:</h1>
-          <Button
-            onClick={handleAddNewTrialMatch}
-            style={{
-              backgroundColor: "#193664",
-              color: "#fff",
-              height: "56px",
-            }}
-            htmlType="submit"
-            className="w-[100px] h-[56px] py-4 mt-2 text-white hover:border-none border-none rounded-lg"
-          >
-            Add New
-          </Button>
+      <div className="flex gap-4">
+        <div className="w-6/12">
+          <div className="flex justify-end py-2">
+            <Button className="mb-2" onClick={handleAddNewNormalMatch} style={{ backgroundColor: "#0057B8", color: "#fff" }}>
+              Add New Normal Match
+            </Button>
+          </div>
+          <Collapse items={normalMatchItems} />
         </div>
-        <Collapse items={trialMatchItems} defaultActiveKey={["1"]} onChange={onChange} />
+        <div className="w-6/12">
+          <div className="flex flex-row justify-end py-2">
+            <Button className="mb-2" onClick={handleAddNewTrialMatch} style={{ backgroundColor: "#0057B8", color: "#fff" }}>
+              Add New Trial Match
+            </Button>
+          </div>
+          <Collapse items={trialMatchItems} />
+        </div>
       </div>
     </div>
   );
