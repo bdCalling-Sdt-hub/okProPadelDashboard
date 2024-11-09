@@ -48,14 +48,14 @@ console.log("44", cardDataa);
           <h1 className="text-xl font-bold text-[#5D5D5D]">Overview</h1>
           <p className="text-[#5D5D5D]">Activities summary at a glance</p>
         </div>
-        <div className="pr-8">
+        {/* <div className="pr-8">
           <SelectBox
             options={selectOptions}
             placeholder="Week"
             onChange={handleSelectChange}
             style={{ width: 100 }}
           />
-        </div>
+        </div> */}
       </div>
       <div className="grid grid-cols-3 w-[calc(100% -300px)] mt-[12px]">
         {cardDataa.map((card, index) => (
@@ -69,7 +69,7 @@ console.log("44", cardDataa);
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-secondary py-4 text-[34px] font-bold">{card.value}</h1>
-                <FaArrowTrendUp color={selectedCard === index ? "white" : "#28A745"} size={20} />
+                {/* <FaArrowTrendUp color={selectedCard === index ? "white" : "#28A745"} size={20} /> */}
               </div>
               <h1 className="text-[16px] font-bold">{card.title}</h1>
               <p>{card.description}</p>

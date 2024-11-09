@@ -23,6 +23,7 @@ import Club from './../pages/Club';
 import Volunteer from "../pages/Volunteer";
 import Profile from "../pages/Profile";
 import SeeSetupTrialMatch from "../pages/SeeSetupTrialMatch";
+import FeedBack from "../pages/FeedBack";
 
 
 
@@ -81,6 +82,10 @@ const router = createBrowserRouter([
                 element: <Questionaries />
             },
             {
+                path: "/feedback",
+                element: <FeedBack />
+            },
+            {
                 path: "/settings",
                 element: <SettingsPage />,
             },
@@ -97,7 +102,7 @@ const router = createBrowserRouter([
                 element: <SettingsTermsAndConditions />
             },
             {
-                path: "settings/termsAndCondition/edittermsAndConditions",
+                path: "settings/termsAndCondition/edittermsAndConditions/:id",
                 element: <EditTermsAndCondition />
             },
             {

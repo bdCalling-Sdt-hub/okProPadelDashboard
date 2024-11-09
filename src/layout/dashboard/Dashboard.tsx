@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar, Badge, Layout, Menu, Popover } from "antd";
+import { Avatar, Badge, Image, Layout, Menu, Popover } from "antd";
 import { Bell, Lock, LogOut, User, User2Icon } from "lucide-react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/Images/LogoOkProPadel.png";
@@ -26,6 +26,7 @@ import { BiPieChartAlt2 } from "react-icons/bi";
 import { IoIosCard } from "react-icons/io";
 import Questionaries from "../../assets/Images/dashboard/questionaries.svg";
 import { BsMicrosoftTeams } from "react-icons/bs";
+import { useGetProfileQuery } from "../../redux/features/getProfleApi";
 
 const { Header, Sider, Content } = Layout;
 
@@ -107,12 +108,16 @@ const menuItems: MenuItem[] = [
       />
     ),
   },
-  // {
-  //   path: "/transactions",
-  //   title: "Transactions",
-  //   icon: <img src={transaction} alt="Logo" width={18} height={18} color="white"/>,
-  //   activeIcon: <img src={transaction1} alt="Logo" width={18} height={18} color="white" />,
-  // },
+  {
+    path: "/feedback",
+    title: "Feedback",
+    icon: (
+      <img src={transaction} alt="Logo" width={18} height={18} color="white" />
+    ),
+    activeIcon: (
+      <img src={transaction1} alt="Logo" width={18} height={18} color="white" />
+    ),
+  },
   {
     path: "/settings",
     title: "Settings",
@@ -155,12 +160,12 @@ const menuItems: MenuItem[] = [
 const content = (
   <div className="w-40">
     <p className="mb-2">
-      <Link to="/profile" className="flex items-center gap-2">
+      <Link to="/settings/personalInformation" className="flex items-center gap-2">
         <User2Icon size={18} /> <span className="text-md">Profile</span>
       </Link>
     </p>
     <p className="mb-3">
-      <Link to="/change-password" className="flex items-center gap-2">
+      <Link to="/settings/personalInformation" className="flex items-center gap-2">
         <Lock size={18} /> <span className="text-md">Change password</span>
       </Link>
     </p>
@@ -168,6 +173,8 @@ const content = (
 );
 
 const Dashboard: React.FC = () => {
+  const { data, isLoading, isError } = useGetProfileQuery();
+  console.log(data?.data?.full_name);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -184,7 +191,9 @@ const Dashboard: React.FC = () => {
       case "/":
         return (
           <h1 className="text-[#333333] font-bold text-[24px]">
-            <span className="text-[#B0B0B0]">Hello,</span> Maria 👋
+            <span className="text-[#B0B0B0] px-2">Hello,</span>
+            {data?.data?.full_name}
+            👋
           </h1>
         );
       case "/club":
@@ -206,6 +215,10 @@ const Dashboard: React.FC = () => {
           <h1 className="text-[#333333] font-bold text-[24px]">
             Questionaries
           </h1>
+        );
+      case "/feedback":
+        return (
+          <h1 className="text-[#333333] font-bold text-[24px]">FeedBack</h1>
         );
       case "/transactions":
         return (
@@ -316,22 +329,40 @@ const Dashboard: React.FC = () => {
                 }
               })}
             </div>
-            <div className="flex py-12 gap-8 mt-16 px-4 w-full">
-              <div className="flex gap-2 w-3/4 items-center">
+            <div className="flex w-full px-4">
+              <div className=" flex gap-2 w-[900px] items-center">
                 <Popover
                   className="cursor-pointer"
                   placement="top"
                   content={content}
                 >
-                  <Avatar
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      backgroundColor: "gray",
-                    }}
-                    icon={<User size={25} />}
-                  />
+                  {data?.data?.image && data?.data?.image !== "image" ? (
+                    <Image
+                      src={data.data.image}
+                      alt="Profile"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "50%",
+                      }}
+                      onError={(e) => {
+                        // Fallback to Avatar if image fails to load
+                        e.currentTarget.onerror = null; // Prevent infinite loop
+                        e.currentTarget.src = ""; // Trigger fallback below
+                      }}
+                    />
+                  ) : (
+                    <Avatar
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        backgroundColor: "gray",
+                      }}
+                      icon={<User size={25} />}
+                    />
+                  )}
                 </Popover>
+
                 <div className="space-y-4">
                   <h1 className="text-white">Maria</h1>
                   <h1 className="text-white">ex@ample.com</h1>

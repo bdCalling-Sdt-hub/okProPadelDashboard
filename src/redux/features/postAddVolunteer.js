@@ -7,8 +7,8 @@ const postAddVolunteerApi = baseApi.injectEndpoints({
           url: `/volunteer`,
           method: 'POST',
           body: data,
-         
         }),
+        invalidatesTags: ["Volunteers"]
       }),
     }),
   });

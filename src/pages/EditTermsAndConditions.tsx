@@ -1,90 +1,59 @@
-import { Form, Input, Button } from "antd";
+import { Button } from "antd";
 import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import JoditEditor from "jodit-react";
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import React from "react";
-
-// Define the types for the API response
-interface ApiResponse {
-  data: {
-    statusCode: number;
-    message: string;
-  };
-}
-
-// Mock data for content (replace this with real data fetching logic)
-const data = {
-  data: {
-    attributes: {
-      content: "Initial terms and conditions content.",
-    },
-  },
-};
+import { usePostTermsAndConditionMutation } from "../redux/features/postTermsAndCondition";
+import { useGetTermsAndConditionQuery } from "../redux/features/getTermsAndConditionApi";
 
 const EditTermsAndCondition: React.FC = () => {
   const navigate = useNavigate();
   const editor = useRef(null);
   const [content, setContent] = useState<string>("");
+  
+  // Initialize the mutation
+  const [postTermsAndCondition, { isLoading }] = usePostTermsAndConditionMutation();
+  const {data} = useGetTermsAndConditionQuery();
 
   useEffect(() => {
-    setContent(data?.data?.attributes?.content || "");
+    const existingData = data?.data?.content
+    // Load initial data (replace with actual data fetching)
+    setContent(existingData); // Use the mock data content
   }, []);
 
-  const setData = async (newData: {
-    content: string;
-  }): Promise<ApiResponse> => {
-    // Mock API response (replace with actual API call)
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          data: {
-            statusCode: 201,
-            message: "Terms and conditions updated successfully!",
-          },
-        });
-      }, 1000);
-    });
-  };
-
   const handleUpdate = async () => {
-    console.log(content);
-    Swal.fire({
-      position: 'top',                // Use valid SweetAlertPosition
-      icon: 'success',                 // Use valid SweetAlertIcon
-      showConfirmButton: false,
-      timer: 1500
-    });
-    navigate("/settings/termsAndCondition");
+    try {
+      const div = document.createElement("div");
+      div.innerHTML = content;
+      const cleanedContent = div.textContent || div.innerHTML || "";
+      // Make the API call
+      const response = await postTermsAndCondition({ content: cleanedContent, status: "1", _method: "PUT" }).unwrap();
 
-    // try {
-    //   const response = await setData({
-    //     content: content,
-    //   });
-
-    //   if (response?.data?.statusCode === 201) {
-    //     Swal.fire({
-    //       position: "top-center",
-    //       icon: "success",
-    //       title: response?.data?.message,
-    //       showConfirmButton: false,
-    //       timer: 1500,
-    //     });
-    //     navigate("/settings/terms-conditions");
-    //   }
-    // } catch (error: any) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Try Again...",
-    //     text: error?.response?.data?.message || "An error occurred",
-    //     footer: '<a href="#">Why do I have this issue?</a>',
-    //   });
-    // }
+      if (response) {
+        Swal.fire({
+          position: "top-center",
+          icon: "success",
+          title: response.message,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+       
+        navigate("/settings/termsAndCondition");
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Try Again...",
+        text: error?.data?.message || "An error occurred",
+        footer: '<a href="#">Why do I have this issue?</a>',
+      });
+    }
   };
 
   const handleBackTermsAndCondition = () => {
-    navigate("/termsAndConditons");
+    navigate("/settings/termsAndCondition");
   };
 
   return (
@@ -101,10 +70,10 @@ const EditTermsAndCondition: React.FC = () => {
           ref={editor}
           value={content}
           onChange={(newContent) => setContent(newContent)}
-          className="text-wrap bg-red-900"
         />
         <Button
           onClick={handleUpdate}
+          loading={isLoading} // Show loading state on the button
           style={{
             backgroundColor: "#193664",
             color: "#fff",

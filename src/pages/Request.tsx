@@ -19,6 +19,7 @@ const { Option } = Select;
 
 interface UserAction {
   sId: number;
+  userId: number;
   image: React.ReactNode;
   name: string;
   email: string;
@@ -61,23 +62,29 @@ const Request: React.FC = () => {
   const [postSetupTrialMatch] = usePostSetupTrialMatchMutation();
 
   const pageSize = 10;
-
+console.log("64", requestMatch);
   // Construct dataSource with optional chaining
   const dataSource =
     requestMatch?.data?.map((item, index) => ({
       sId: item.request_id,
+      userId: item?.user?.id,
+      time: item?.created_at,
+      date: item?.created_at,
       name: item?.user?.full_name,
       location: item?.user?.location,
       currentLevel: item?.user?.current_level,
       requestedLevel: item?.request_level,
-      club: item?.club || [], // Default to empty array if club is undefined
+      club: Array.isArray(item?.club) ? item.club.map(c=> c.id) : [], // Default to empty array if club is undefined,
       status: item?.status,
       action: {
         sId: item.request_id,
+        userId: item?.user?.user_id,
+        time: item?.created_at,
+        date: item?.created_at,
         name: item?.user?.full_name,
         currentLevel: item?.user?.current_level,
         requestedLevel: item?.request_level,
-        club: item?.club || [], // Default to empty array if club is undefined
+        club: Array.isArray(item?.club) ? item.club.map(c=> c.id) : [], // Default to empty array if club is undefined
         email: `player${index + 1}@example.com`,
         status: item?.status,
         dateOfBirth: "24-05-2024",
@@ -145,14 +152,14 @@ const Request: React.FC = () => {
     }
     setOpenTrialModal(true);
   };
-
+console.log("trialmatch data", trialMatchData);
   const confirmTrialMatch = async () => {
     if (trialMatchData) {
       const id = trialMatchData.sId;
         console.log("146, Selected Opponents before posting:", selectedOpponents); // Debugging step
         const postData = {
-            user_id: trialMatchData.sId,
-            club_id: selectedClubs[trialMatchData.sId] || trialMatchData.club?.[0]?.id,
+            user_id: trialMatchData.userId,
+            club_id: selectedClubs[trialMatchData.sId] || trialMatchData.club,
             volunteer_ids: selectedOpponents?.length > 0 ? selectedOpponents : [], // Ensure it's an array
             time: moment().format("HH:mm"),
             date: moment().format("YYYY-MM-DD"),

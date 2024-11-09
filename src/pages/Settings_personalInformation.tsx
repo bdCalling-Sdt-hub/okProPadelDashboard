@@ -4,7 +4,7 @@ import type { UploadFile, UploadProps, FormProps } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { useGetPersonalInformationQuery } from '../redux/features/getPersonalInformationApi';
-
+import { useUpdatePersonalInformationMutation } from '../redux/features/putUpdatePersonalInfromation';
 
 type FileType = Exclude<Parameters<UploadProps['beforeUpload']>[0], undefined>;
 
@@ -17,39 +17,34 @@ interface FieldType {
   confirmPassword?: string;
 }
 
-const Settings_personalInformation: React.FC = () => {
+const SettingsPersonalInformation: React.FC = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
 
   // Fetch personal information data
   const { data, isLoading, isError } = useGetPersonalInformationQuery();
-console.log("27",data?.data);
+  const [updatePersonalInformation] = useUpdatePersonalInformationMutation();
+console.log("28", previewImage);
   useEffect(() => {
     if (data && data.data) {
-      console.log("Fetched data:", data); // Debugging check for fetched data
-
       form.setFieldsValue({
         name: data.data.full_name,
         email: data.data.email,
       });
 
-      // Check and set image URL
       if (data.data.image) {
         const imageUrl = data.data.image;
-        console.log("Image URL:", imageUrl); // Debugging check for image URL
-
+        console.log(imageUrl);
         setFileList([
           {
             uid: '-1',
             name: 'profile.png',
             status: 'done',
             url: imageUrl,
-            thumbUrl: imageUrl, // Adding thumbUrl for Upload preview
           } as UploadFile,
         ]);
-
-        setPreviewImage(imageUrl); // Set preview image as a fallback
+        setPreviewImage(imageUrl);
       }
     } else if (isError) {
       message.error("Failed to load personal information");
@@ -75,9 +70,31 @@ console.log("27",data?.data);
     imgWindow?.document.write(image.outerHTML);
   };
 
-  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    console.log('Form submitted with values:', values);
-    message.success("Profile updated successfully");
+  const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+    if (!fileList.length || !fileList[0].originFileObj) {
+      message.error("Please upload a profile image");
+      return;
+    }
+
+    // Create a FormData object and append form values
+    const formData = new FormData();
+    formData.append("_method", "PUT");
+    formData.append("full_name", values.name || "");
+    formData.append("old_password", values.oldPassword || "");
+    formData.append("new_password", values.newPassword || "");
+    formData.append("confirm_password", values.confirmPassword || "");
+
+    // Append the image file as a File object
+    const imageFile = fileList[0].originFileObj as File;
+    formData.append("image", imageFile, imageFile.name);
+
+    try {
+      await updatePersonalInformation(formData);
+      message.success("Profile updated successfully");
+      console.log("FormData content:", Array.from(formData.entries()));
+    } catch (error) {
+      message.error("Failed to update profile");
+    }
   };
 
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
@@ -97,13 +114,8 @@ console.log("27",data?.data);
             {fileList.length < 1 && '+ Upload'}
           </Upload>
         </ImgCrop>
-        {/* Fallback Preview Image */}
-        {!fileList.length && previewImage && (
-          <img src={previewImage} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
-        )}
-        <h1>Name:</h1>
+        
       </div>
-
       <Form
         name="basic"
         form={form}
@@ -114,13 +126,19 @@ console.log("27",data?.data);
         autoComplete="off"
       >
         <Form.Item<FieldType>
+          name="name"
+          label="Name"
+          rules={[{ required: false, message: 'Please input your name!' }]}
+        >
+          <Input placeholder="Name" className='h-12' />
+        </Form.Item>
+        <Form.Item<FieldType>
           name="email"
           label="Email"
           rules={[{ required: true, message: 'Please input your email!' }]}
         >
-          <Input placeholder={data?.data?.email} className='h-12' />
+          <Input placeholder="Email" className='h-12' />
         </Form.Item>
-
         <Form.Item<FieldType>
           name="oldPassword"
           label="Old Password"
@@ -129,10 +147,9 @@ console.log("27",data?.data);
           <Input.Password
             placeholder='Old Password'
             className='h-12'
-            iconRender={(visible) => visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
+            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
           />
         </Form.Item>
-
         <Form.Item<FieldType>
           name="newPassword"
           label="New Password"
@@ -141,10 +158,9 @@ console.log("27",data?.data);
           <Input.Password
             placeholder='New Password'
             className='h-12'
-            iconRender={(visible) => visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
+            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
           />
         </Form.Item>
-
         <Form.Item<FieldType>
           name="confirmPassword"
           label="Confirm Password"
@@ -153,10 +169,9 @@ console.log("27",data?.data);
           <Input.Password
             placeholder='Confirm Password'
             className='h-12'
-            iconRender={(visible) => visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
+            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
           />
         </Form.Item>
-
         <Form.Item>
           <Button type="primary" className='w-full h-12 bg-[#4964C6]' htmlType="submit">
             Edit
@@ -167,4 +182,4 @@ console.log("27",data?.data);
   );
 };
 
-export default Settings_personalInformation;
+export default SettingsPersonalInformation;

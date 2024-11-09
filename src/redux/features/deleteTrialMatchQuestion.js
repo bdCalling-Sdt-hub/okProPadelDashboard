@@ -1,10 +1,10 @@
 import { baseApi } from "../api/baseApi";
 
-const deleteNormalMatchQuestionApi = baseApi.injectEndpoints({
+const deleteTrialMatchQuestionApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        deleteNormalMatchQuestion: builder.mutation({
+        deleteTrialMatchQuestion: builder.mutation({
             query: ({ id }) => ({
-                url: `/question/${id}`, 
+                url: `/trail-match-question-delete/${id}`, 
                 method: 'DELETE',
                 body: { _method: "DELETE" },
             }),
@@ -13,4 +13,4 @@ const deleteNormalMatchQuestionApi = baseApi.injectEndpoints({
     }),
 });
 
-export const {useDeleteNormalMatchQuestionMutation} = deleteNormalMatchQuestionApi; // 
+export const {useDeleteTrialMatchQuestionMutation} = deleteTrialMatchQuestionApi; // 

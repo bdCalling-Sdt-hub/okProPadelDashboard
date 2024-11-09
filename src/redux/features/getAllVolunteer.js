@@ -4,8 +4,10 @@ const getAllVolunteerApi = baseApi.injectEndpoints({
     endpoints:(builder)=>({
         getAllVolunteer:builder.query({
             query:()=>`/volunteers`,
-            providesTags:["Users"],
+            providesTags:["Volunteers"],
+            extraOptions: { refetchOnMountOrArgChange: true },
         })
+        
     })
 })
 

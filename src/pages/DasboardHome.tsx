@@ -22,15 +22,15 @@ const DasboardHome = (props: Props) => {
       <div className="flex gap-4">
         <div className=" h-[350px] w-full mt-8 justify-center bg-white rounded-2xl">
           <div className="flex justify-between w-full px-6">
-            <div className="text-lg font-bold">Activities</div>
-            <div>
+            <div className="text-lg font-bold py-4">Activities</div>
+            {/* <div>
               <SelectBox
                 placeholder="Last week"
                 options={selectOptions}
                 onChange={handleSelectChange}
                 style={{ width: 150 }}
               />
-            </div>
+            </div> */}
           </div>
           <SellerActivityChart />
         </div>

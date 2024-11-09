@@ -6,7 +6,7 @@ const deleteUserApi = baseApi.injectEndpoints({
             query: ({ id }) => ({
                 url: `/delete-user/${id}`, 
                 method: 'DELETE',
-                body: { _method: "DELETE" },
+                // body: { _method: "DELETE" },
             }),
             invalidatesTags: ["Users"],
         }),

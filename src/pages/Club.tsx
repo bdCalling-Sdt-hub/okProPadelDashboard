@@ -221,7 +221,9 @@ console.log("36", latitude, longitude);
         onCancel={handleCancel}
         footer={null}
       >
-        <Form form={form} onFinish={handleFormSubmit}>
+        <Form
+         layout="vertical"
+        form={form} onFinish={handleFormSubmit}>
           <Form.Item>
             <Upload
               fileList={fileList}
@@ -244,7 +246,7 @@ console.log("36", latitude, longitude);
             label="Club Name"
             rules={[{ required: true, message: "Please enter the club name" }]}
           >
-            <Input placeholder="Enter club name" />
+            <Input className="w-full" placeholder="Enter club name" />
           </Form.Item>
 
           {/* <Form.Item
@@ -268,7 +270,7 @@ console.log("36", latitude, longitude);
             label="Activities"
             rules={[{ required: true, message: "Please enter activities" }]}
           >
-            <Input placeholder="Enter activities separated by commas" />
+            <Input className="w-full" placeholder="Enter activities separated by commas" />
           </Form.Item>
 
           <Form.Item
@@ -294,11 +296,13 @@ console.log("36", latitude, longitude);
                 }
                 onPlaceChanged={hanldlePlaceChanged}
               >
-                <Input placeholder="Search location" />
+                <Input className="w-full" placeholder="Search location" />
               </Autocomplete>
               {/* display google map */}
               <GoogleMap
                 mapContainerStyle={{
+                  borderRadius: "10px",
+               
                   width: "100%",
                   height: "200px",
                   marginTop: "16px",
@@ -318,7 +322,7 @@ console.log("36", latitude, longitude);
               { type: "url", message: "Please enter a valid website URL" },
             ]}
           >
-            <Input placeholder="www.website.com" />
+            <Input className="w-full" placeholder="www.website.com" />
           </Form.Item>
 
           <Form.Item>

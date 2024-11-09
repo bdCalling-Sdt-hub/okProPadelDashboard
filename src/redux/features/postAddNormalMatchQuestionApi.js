@@ -9,6 +9,7 @@ const postAddNormalMatchQuestionApi = baseApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
+      invalidatesTags: ["Question"]
     }),
   }),
 });

@@ -52,17 +52,17 @@ const Volunteer: React.FC = () => {
     "05 (Professional)",
   ];
 
-  const tableData =
-    data?.data?.volunteers.map((volunteer) => ({
-      sId: volunteer.id,
-      name: volunteer.name,
-      location: volunteer.location,
-      email: volunteer.email,
-      currentLevel: volunteer.level,
-      role: volunteer.role || "04 (Advanced)",
-      status: volunteer.status ? "Active" : "Inactive",
-    })) || [];
-
+  const tableData = (data?.data?.volunteers || []).map((volunteer) => ({
+    key: volunteer.id, // Unique key for each row in the table
+    sId: volunteer.id,
+    name: volunteer.name,
+    location: volunteer.location,
+    email: volunteer.email,
+    currentLevel: volunteer.level,
+    role: volunteer.role || "04 (Advanced)",
+    status: volunteer.status ? "Active" : "Inactive",
+  }));
+  
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
     { title: "Email", dataIndex: "email", key: "email" },
@@ -73,7 +73,7 @@ const Volunteer: React.FC = () => {
       dataIndex: "role",
       key: "role",
       render: (_, record) => (
-        <Select defaultValue={record.role} style={{ width: 220 }} disabled>
+        <Select value={record.role} style={{ width: 220 }} disabled>
           {roleOptions.map((role) => (
             <Option key={role} value={role}>
               {role}
@@ -96,7 +96,8 @@ const Volunteer: React.FC = () => {
       ),
     },
   ];
-
+  
+  
   const handlePageChange = (page) => setCurrentPage(page);
 
   const handleAddVolunteer = () => {

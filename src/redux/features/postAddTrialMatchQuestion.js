@@ -9,6 +9,7 @@ const postAddTrialMatchQuestionApi = baseApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
+      invalidatesTags: ["Question"]
     }),
   }),
 });

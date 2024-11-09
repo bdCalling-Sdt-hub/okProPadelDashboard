@@ -1,47 +1,39 @@
-import { Input, Table } from "antd";
+import { Input, Table, Modal, Button, Radio } from "antd";
 import { Pencil, Search, Trash, Eye } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import image from "../assets/Images/Notifications/Avatar.png";
-import ModalComponent from "../component/share/ModalComponent";
 import { useGetAllUsersQuery } from "../redux/features/getAllUsersApi";
 import { useGetUserDetailsQuery } from "../redux/features/getUserDetialsApi";
 import { useDeleteUserMutation } from "../redux/features/deleteUserApi";
 import { useSearchUsersQuery } from "../redux/features/getSearchUser";
+import { usePutChangeUserStatusMutation } from "../redux/features/putChangeUserStatus";
 
 const Manage_Users = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [searchTerm, setSearchTerm] = useState<string>(""); 
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [openModel, setOpenModel] = useState<boolean>(false);
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
   const [openViewModal, setOpenViewModal] = useState<boolean>(false);
   const [userData, setUserData] = useState<UserAction | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
-  const [role, setRole] = useState<string>("");
+  const [status, setStatus] = useState<string>("active");
 
   const pageSize = 5;
 
-  // Conditionally fetch users based on search term
   const { data, isLoading, isError } = searchTerm
-    ? useSearchUsersQuery(searchTerm) 
+    ? useSearchUsersQuery(searchTerm)
     : useGetAllUsersQuery({
         page: currentPage,
         perPage: pageSize,
       });
-
+console.log("29", data);
   const { data: userDetails } = useGetUserDetailsQuery(userId, { skip: !userId });
- console.log("32", userDetails);
-  const [deleteUser] = useDeleteUserMutation();
-
-  // Debugging to verify if search data is returned correctly
-  useEffect(() => {
-    console.log("Search Term:", searchTerm);
-    console.log("Fetched Data:", data);
-  }, [data, searchTerm]);
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
+  const [putChangeUserStatus, { isLoading: isUpdating }] = usePutChangeUserStatusMutation();
 
   const handleSearch = (value: string) => {
-    console.log("42", value);
     setSearchTerm(value);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
   const userDataSource = data?.data?.users?.map((user) => ({
@@ -51,14 +43,14 @@ const Manage_Users = () => {
     email: user.email,
     location: user.location || "N/A",
     level: user.level || "N/A",
-    status: user.status === "active" ? "Active" : "Blocked",
+    status: user.status === "banned" ? "Blocked" : "Active",
     action: {
       sId: user.id,
       image: <img src={user.image || image} className="w-9 h-9 rounded" alt="avatar" />,
       name: user.full_name,
       dateOfBirth: "24-05-2024",
       contact: "0521545861520",
-      role: user.status === "active" ? "Member" : "Admin",
+      status: user.status,
       email: user.email,
     },
   })) || [];
@@ -102,8 +94,9 @@ const Manage_Users = () => {
   const handlePage = (page: number) => setCurrentPage(page);
 
   const handleUser = (action: UserAction) => {
+    console.log("97",action);
     setUserData(action);
-    setRole(action.role);
+    setStatus(action.status); 
     setOpenModel(true);
   };
 
@@ -113,44 +106,55 @@ const Manage_Users = () => {
   };
 
   const handleDelete = (action: UserAction) => {
+    console.log("109", action);
     setUserData(action);
     setOpenDeleteModal(true);
   };
 
-  const confirmDelete = async () => {
+  const onDeleteConfirm = async () => {
+    console.log("113", userData);
     if (userData?.sId) {
       try {
-        await deleteUser({ id: userData.sId }).unwrap();
-        console.log("User deleted successfully:", userData.sId);
+        await deleteUser({ id: userData?.sId });
         setOpenDeleteModal(false);
+        console.log("User deleted successfully");
       } catch (error) {
         console.error("Failed to delete user:", error);
       }
     }
   };
 
-  // Check for loading, error, or no data scenarios
+  const onConfirmRoleChange = async () => {
+    if (userData?.sId) {
+      try {
+        await putChangeUserStatus({
+          id: userData.sId,
+          data: { status, _method: "PUT" },
+        }).unwrap();
+        setOpenModel(false);
+        console.log("Status updated successfully");
+      } catch (error) {
+        console.error("Error updating status:", error);
+      }
+    }
+  };
+
+  const onViewModalClose = () => {
+    setOpenViewModal(false);
+  };
+
   if (isLoading) return <p>Loading users...</p>;
   if (isError) return <p>Error loading users. Please try again later.</p>;
-  if (searchTerm && !userDataSource.length) return <p>No users found for the search term.</p>;
 
   return (
     <div>
-      {/* <Input
+      <Input
         prefix={<Search />}
         className="w-full rounded-2xl h-12 bg-base border-0 text-primary placeholder:text-gray-200"
         placeholder="Search by email"
         style={{ backgroundColor: "#f0f0f0", color: "#333333" }}
         onChange={(e) => handleSearch(e.target.value)}
-      /> */}
-
-<Input
-          prefix={<Search />}
-          className="w-will rounded-2xl h-12 bg-base border-0 text-primary placeholder:text-gray-200"
-          placeholder="Search by email"
-          style={{ backgroundColor: "#f0f0f0", color: "#333333" }}
-          onChange={(e) => handleSearch(e.target.value)}
-        />
+      />
       <div className="py-8">
         <Table
           dataSource={userDataSource}
@@ -160,54 +164,74 @@ const Manage_Users = () => {
             total: data?.data?.meta?.total || 50,
             current: currentPage,
             onChange: handlePage,
-            
-            
           }}
-          
           rowClassName={() => "hover:bg-transparent"}
         />
-        <ModalComponent openModel={openModel} setOpenModel={setOpenModel} title="User role" subtitle="This is the current role of the selected user" cancelLabel="Cancel" role={role} setRole={setRole} showRoleSelect={true} confirmLabel="Save Changes" onConfirm={() => setOpenModel(false)} value={{ id: userData?.sId, full_name: userData?.name, email: userData?.email, status: role }} />
 
-        <ModalComponent openModel={openDeleteModal} setOpenModel={setOpenDeleteModal} title="Delete User" subtitle="Are you sure you want to delete this item?" confirmLabel="Delete" cancelLabel="Cancel" onConfirm={confirmDelete} value={{ id: userData?.sId, full_name: userData?.name, email: userData?.email, status: role }} />
+        <Modal
+          visible={openModel}
+          onCancel={() => setOpenModel(false)}
+          title="User Status"
+          footer={[
+            <Button key="cancel" onClick={() => setOpenModel(false)}>
+              Cancel
+            </Button>,
+            <Button key="confirm" type="primary" onClick={onConfirmRoleChange} loading={isUpdating}>
+              Save Changes
+            </Button>,
+          ]}
+        >
+          <p><strong>Name:</strong> {userData?.name}</p>
+          <p><strong>Email:</strong> {userData?.email}</p>
+          <Radio.Group onChange={(e) => setStatus(e.target.value)} value={status}>
+            <Radio value="active">Active</Radio>
+            <Radio value="banned">Blocked</Radio>
+          </Radio.Group>
+        </Modal>
 
-        <ModalComponent 
-        openModel={openViewModal} 
-        setOpenModel={setOpenViewModal} 
-        confirmLabel="Close" 
-        value={{ id: userDetails?.data?.id || userData?.sId, full_name: userDetails?.data?.full_name || userData?.name, email: userDetails?.data?.email || userData?.email, location: userDetails?.data?.location || "N/A", level: userDetails?.data?.level_name, points: userDetails?.data?.points, role: userDetails?.data?.role || userData?.role, created_at: userDetails?.data?.created_at, image: userDetails?.data?.image || userData?.image }} showRoleSelect={false} onConfirm={() => setOpenViewModal(false)}>
+        <Modal
+          visible={openDeleteModal}
+          onCancel={() => setOpenDeleteModal(false)}
+          title="Delete User"
+          footer={[
+            <Button key="cancel" onClick={() => setOpenDeleteModal(false)}>
+              Cancel
+            </Button>,
+            <Button key="confirm" type="primary" danger onClick={onDeleteConfirm} loading={isDeleting}>
+              Delete
+            </Button>,
+          ]}
+        >
+          <p>Are you sure you want to delete this user?</p>
+        </Modal>
+
+        <Modal
+          visible={openViewModal}
+          onCancel={onViewModalClose}
+          title="User Details"
+          footer={[
+            <Button key="close" type="primary" onClick={onViewModalClose}>
+              Close
+            </Button>,
+          ]}
+        >
           {userDetails ? (
-            <div className="">
+            <div className="border border-gray-200 rounded-lg p-12">
               {userDetails?.data?.image && (
-                <img src={userDetails?.data?.image} alt="User Avatar" className="w-24 h-24 bg-red-900 rounded-full mb-4 mx-auto" />
+                <img src={userDetails?.data?.image} alt="User Avatar" className="w-24 flex mx-auto mb-12 h-24 rounded-full mb-4" />
               )}
-              <p className="text-black">
-                <strong>Full Name:</strong> {userDetails.data.full_name}
-              </p>
-              <p className="text-black py-2">
-                <strong>Email:</strong> {userDetails.data.email}
-              </p>
-              <p className="text-black py-2">
-                <strong>Location:</strong> {userDetails.data.location || "N/A"}
-              </p>
-              <div className="flex gap-12 py-2 items-center justify-center">
-                <p className="text-black">
-                  <strong>Level:</strong> {userDetails.data.level_name}
-                </p>
-                <p className="text-black">
-                  <strong>Points:</strong> {userDetails.data.points}
-                </p>
-              </div>
-              <p className="text-black py-2">
-                <strong>Role:</strong> {userDetails.data.role}
-              </p>
-              <p className="text-black py-2">
-                <strong>Created At:</strong> {userDetails.data.created_at}
-              </p>
+              <p className="text-black text-lg "><strong>Full Name:</strong> {userDetails.data.full_name}</p>
+              <p className="text-black py-2"><strong>Email:</strong> {userDetails.data.email}</p>
+              <p className="text-black"><strong>Location:</strong> {userDetails.data.location || "N/A"}</p>
+              <p className="text-black py-2"><strong>Level:</strong> {userDetails.data.level_name}</p>
+              <p className="text-black"><strong>Points:</strong> {userDetails.data.points}</p>
+              <p className="text-black py-2"><strong>Role:</strong> {userDetails.data.role}</p>
+              <p className="text-black"><strong>Created At:</strong> {userDetails.data.created_at}</p>
             </div>
           ) : (
             <p>Loading user details...</p>
           )}
-        </ModalComponent>
+        </Modal>
       </div>
     </div>
   );
