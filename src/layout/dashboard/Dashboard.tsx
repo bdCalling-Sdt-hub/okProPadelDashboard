@@ -27,6 +27,7 @@ import { IoIosCard } from "react-icons/io";
 import Questionaries from "../../assets/Images/dashboard/questionaries.svg";
 import { BsMicrosoftTeams } from "react-icons/bs";
 import { useGetProfileQuery } from "../../redux/features/getProfleApi";
+import { useGetNotificationsQuery } from "../../redux/features/getNotificationApi";
 
 const { Header, Sider, Content } = Layout;
 
@@ -174,10 +175,13 @@ const content = (
 
 const Dashboard: React.FC = () => {
   const { data, isLoading, isError } = useGetProfileQuery();
+  const {data: notification} = useGetNotificationsQuery();
   console.log(data?.data?.full_name);
   const navigate = useNavigate();
   const location = useLocation();
-
+const allNotify = notification?.data?.map(item => item?.read_at) || [];
+const nullCount = allNotify.filter(nullCont => nullCont === null).length
+console.log("184", nullCount);
   const handleLogout = () => {
     navigate("/auth/login");
   };
@@ -402,7 +406,7 @@ const Dashboard: React.FC = () => {
               className="cursor-pointer"
               style={{ zIndex: 11 }}
             >
-              <Badge count={5}>
+              <Badge count={nullCount}>
                 <Bell size={30} color="gray" />
               </Badge>
             </div>

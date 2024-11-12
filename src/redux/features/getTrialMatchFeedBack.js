@@ -4,7 +4,7 @@ const getTrialMatchFeedBackApi = baseApi.injectEndpoints({
     endpoints:(builder)=>({
         trialMatchFeedBack:builder.query({
             query:()=>`/trail-match-feedback`,
-            providesTags:["Users"],
+            providesTags:["Feedback"],
         })
     })
 })

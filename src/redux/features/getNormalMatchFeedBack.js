@@ -4,7 +4,7 @@ const getNormalMatchFeedBackApi = baseApi.injectEndpoints({
     endpoints:(builder)=>({
         normalMatchFeedBack:builder.query({
             query:()=>`/normal-match-feedback`,
-            providesTags:["Users"],
+            providesTags:["Feedback"],
         })
     })
 })

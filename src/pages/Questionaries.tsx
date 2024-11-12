@@ -43,32 +43,36 @@ const Questionaries: React.FC = () => {
   console.log("38", trialMatchQuestion);
   console.log("42", tempLabel);
   console.log("44", tempAnswers);
-
   useEffect(() => {
-    // Populate normalMatchData from questenaries
-    const initialData: MatchData = {};
-    questenaries.forEach((item: any) => {
-      initialData[item.id] = {
-        label: item.question,
-        content: item.content || "Default content",
-        answers: [item.A, item.B, item.C, item.D],
-      };
-    });
-    setNormalMatchData(initialData);
-  }, [questenaries]);
-
+    if (data && data.data && data.data.data) {
+      const initialData: MatchData = {};
+      data.data.data.forEach((item: any) => {
+        initialData[item.id] = {
+          label: item.question,
+          content: item.content || "Default content",
+          answers: [item.A, item.B, item.C, item.D],
+        };
+      });
+      setNormalMatchData(initialData);
+    }
+  }, [data]);
+  
   useEffect(() => {
-    // Populate normalMatchData from questenaries
-    const initialData: MatchData = {};
-    trialMatchQuestion.forEach((item: any) => {
-      initialData[item.id] = {
-        label: item.question,
-        content: item.content || "Default content",
-        answers: [item.A, item.B, item.C, item.D],
-      };
-    });
-    setTrialMatchData(initialData);
-  }, [trialMatchQuestion]);
+    if (trialMatcAll && trialMatcAll.data && trialMatcAll.data.data) {
+      const initialData: MatchData = {};
+      trialMatcAll.data.data.forEach((item: any) => {
+        initialData[item.id] = {
+          label: item.question,
+          content: item.content || "Default content",
+          answers: [item.A, item.B, item.C, item.D],
+        };
+      });
+      setTrialMatchData(initialData);
+    }
+  }, [trialMatcAll]);
+  
+
+ 
 
   //   const handleEdit = (key: string, dataType: "normal" | "trial") => {
   //     setEditingPanel(key);

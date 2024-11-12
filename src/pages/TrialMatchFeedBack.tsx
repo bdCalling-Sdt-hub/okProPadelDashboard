@@ -27,37 +27,54 @@ const TrialMatchFeedBack = () => {
   });
 
   console.log("28", data?.data);
-  console.log("30", userData?.user_id);
+  console.log("30", userData);
   console.log("31", userData?.adjust_status);
 
   const [deleteUser] = useDeleteUserMutation();
 
-  const userDataSource = (data?.data?.map((user: any) => ({
-          sId: user.id,
-          image: <img src={user.image || image} className="w-9 h-9 rounded" alt="avatar" />,
-          name: user.full_name,
-          email: user.email,
-          user_id: user?.user_id,
-          tiralMatchId: user?.trail_match_id ,
-          adjust_status: user?.adjust_status,
-          location: "N/A",
-          level: user.level_name || "N/A",
-          status: user.status === "active" ? "Active" : "Blocked",
-          action: {
-            sId: user.id,
-            name: user.full_name,
-            user_id: user?.user_id,
-            email: user.email,
-            tiralMatchId: user?.trail_match_id ,
-            adjust_status: user?.adjust_status,
-            location: "N/A",
-            level: user.level_name,
-            status: user.status === "active" ? "Active" : "Blocked",
-          },
-        }))
-      
-  );
-console.log("", userDataSource);
+  const userDataSource = data?.data?.map((user: any) => ({
+    sId: user.id,
+    image: (
+      <img
+        src={user.profile || image}
+        className="w-9 h-9 rounded-full"
+        alt="avatar"
+      />
+    ),
+    name: user.full_name,
+    email: user.email,
+    user_id: user?.user_id,
+    tiralMatchId: user?.trail_match_id,
+    trialMatchQuestionAnswer: user?.trail_match_question_answers || [],
+    volunteers: user?.volunteer || [],
+    volunteer: user?.volunteer,
+    adjust_status: user?.adjust_status,
+    matchPlayed: user?.matches_played,
+    location: "N/A",
+    level: user.level_name || "N/A",
+    action: {
+      sId: user.id,
+      name: user.full_name,
+      image: (
+        <img
+          src={user.profile || image}
+          className="w-9 h-9"
+          alt="avatar rounded-full"
+        />
+      ),
+      matchPlayed: user?.matches_played,
+      user_id: user?.user_id,
+      email: user.email,
+      tiralMatchId: user?.trail_match_id,
+      trialMatchQuestionAnswer: user?.trail_match_question_answers || [],
+      volunteers: user?.volunteer || [],
+      adjust_status: user?.adjust_status,
+      location: "N/A",
+      level: user.level_name || "N/A",
+      status: user.status === "active" ? "Active" : "Blocked",
+    },
+  }));
+  console.log("", userDataSource);
   const columns = [
     {
       title: "Users",
@@ -73,17 +90,19 @@ console.log("", userDataSource);
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Trial Match Id", dataIndex: "tiralMatchId", key: "tiralMatchId" },
     { title: "Level", dataIndex: "level", key: "level" },
-    { title: "Status", dataIndex: "status", key: "status" },
+    { title: "Match Played", dataIndex: "matchPlayed", key: "matchPlayed" },
     {
       title: <div className="text-right">Action</div>,
       dataIndex: "action",
       key: "action",
       render: (_: any, record: any) => (
         <div className="flex items-center justify-end gap-3">
-          <button onClick={() => handleViewDetails(record.action)} className="hover:bg-primary p-1 rounded bg-blue">
+          <button
+            onClick={() => handleViewDetails(record.action)}
+            className="hover:bg-primary p-1 rounded bg-blue"
+          >
             <Eye />
           </button>
-         
         </div>
       ),
     },
@@ -101,6 +120,13 @@ console.log("", userDataSource);
     setUserData(action);
     setOpenViewModal(true);
   };
+
+  React.useEffect(() => {
+    if (openViewModal) {
+      console.log("userData in Modal:", userData); 
+      console.log("trialMatchQuestionAnswer:", userData?.trialMatchQuestionAnswer);
+    }
+  }, [openViewModal, userData]);
 
   const handleDelete = (action: any) => {
     setUserData(action);
@@ -120,15 +146,15 @@ console.log("", userDataSource);
   };
 
   const toggleButtonLabel = async () => {
-    console.log("122", userData);
     const userId = userData?.sId;
-    console.log("125", userId);
     if (!userId) {
       console.error("User ID is undefined. Cannot toggle level.");
       return;
     }
 
-    setButtonLabel((prevLabel) => (prevLabel === "Down Grade Level" ? "Upgrade Level" : "Down Grade Level"));
+    setButtonLabel((prevLabel) =>
+      prevLabel === "Down Grade Level" ? "Upgrade Level" : "Down Grade Level"
+    );
 
     try {
       const response = await feedbackToggleLevels({
@@ -147,11 +173,10 @@ console.log("", userDataSource);
     }
   };
 
-
-
   if (isLoading) return <p>Loading users...</p>;
   if (isError) return <p>Error loading users. Please try again later.</p>;
-  if (searchTerm && !userDataSource.length) return <p>No users found for the search term.</p>;
+  if (searchTerm && !userDataSource.length)
+    return <p>No users found for the search term.</p>;
 
   return (
     <div>
@@ -204,16 +229,85 @@ console.log("", userDataSource);
           cancelLabel="Cancel"
           onConfirm={toggleButtonLabel}
           value={userData}
+          modalStyle={{ width: '80vw', maxWidth: '900px', padding: '20px' }}  // Custom width for the modal
         >
-          <div className="bg-black p-4 rounded">
-            <p><strong>Full Name:</strong> {userData?.name}</p>
-            <p><strong>Email:</strong> {userData?.email}</p>
-            <p><strong>Location:</strong> {userData?.location || "N/A"}</p>
-            <p><strong>Level:</strong> {userData?.level || "N/A"}</p>
+          <div className="bg-white p-4 rounded border rounded-lg m-6 shadow-lg">
+            <div className="flex items-center justify-center my-6">
+              <img
+                src={userData?.image?.props?.src}
+                className="w-24 h-24 rounded-full"
+                alt="avatar"
+              />
+            </div>
+            <div className="">
+              <div>
+                <div>
+                  <p className="text-xl text-gray-900">
+                    <strong>Full Name:</strong> {userData?.name}
+                  </p>
+                  <p className="text-md text-gray-900">
+                    <strong>Email:</strong> {userData?.email}
+                  </p>
+                  <p className="text-md text-gray-900">
+                    <strong>Trial Match Id:</strong> {userData?.tiralMatchId}
+                  </p>
+                  <p className="text-md text-gray-900">
+                    <strong>Matches Played:</strong>{" "}
+                    {userData?.matchPlayed || "N/A"}
+                  </p>
+                  <p className="text-md text-gray-900">
+                    <strong>Level:</strong> {userData?.level || "N/A"}
+                  </p>
+                  <p className="text-md text-gray-900 pt-2 text-center">
+                    <strong>Question and Answer:-</strong>
+                  </p>
+                </div>
+                {userData?.trialMatchQuestionAnswer?.length > 0 ? (
+                  userData.trialMatchQuestionAnswer.map((qa, idx) => (
+                    <div key={idx}>
+                      <p className="text-gray-900">
+                        <strong>Question-</strong>{" "}
+                        {qa?.question || "No Question Available"}
+                      </p>
+                      <p className="text-gray-900">
+                        <strong>Answer-</strong>
+                        {qa?.answer || "No Question Available"}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-900">No Question Available</p>
+                )}
+              </div>
+              <p className="text-gray-900 txt-md pt-8 text-center">
+                <strong>Volunteers: </strong>
+              </p>
+
+              {userData?.volunteers?.length > 0 ? (
+                userData?.volunteers.map((v, idx) => (
+                  <div key={idx}>
+                    <img
+                      src={v?.image}
+                      className="w-24 h-24 rounded-full"
+                      alt="avatar"
+                    />
+                    <p className="text-gray-900">
+                      <strong>Name</strong>
+                      {v?.name || "No name Available"}
+                    </p>
+                    <p className="text-gray-900">
+                      <strong>Email</strong>
+                      {v?.email || "No Question Available"}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p>No Volunteers available</p>
+              )}
+            </div>
           </div>
         </ModalComponent>
       </div>
-      
     </div>
   );
 };

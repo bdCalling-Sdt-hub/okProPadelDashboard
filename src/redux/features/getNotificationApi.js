@@ -4,7 +4,7 @@ const getNotificationsApi = baseApi.injectEndpoints({
     endpoints:(builder)=>({
         getNotifications:builder.query({
             query:()=>`/notifications`,
-            providesTags:["Users"],
+            providesTags:["Notifications"],
         })
     })
 })

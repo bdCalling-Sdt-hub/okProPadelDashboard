@@ -12,7 +12,7 @@ const postLoginApi = baseApi.injectEndpoints({
                 body: data,
             }
         },
-        invalidatesTags: ["Poftfolio"]
+        invalidatesTags: ["Users"]
        })
     })
 })

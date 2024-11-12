@@ -23,42 +23,45 @@ const NormalMatchFeedBack = () => {
     page: currentPage,
     perPage: pageSize,
   });
-console.log("26", data?.data);
+  console.log("26", data?.data);
+  console.log("27", userData);
   const [deleteUser] = useDeleteUserMutation();
 
-  const userDataSource = (data?.data?.map((user: any) => ({
-          sId: user.id,
-          image: (
-            <img
-              src={user.image || image}
-              className="w-9 h-9 rounded"
-              alt="avatar"
-            />
-          ),
-          name: user.full_name,
-          email: user.email,
-          matchId: user.match_id,
-          matchPlayed: user?.matches_played,
-          user_id: user?.user_id,
-          questionaries: user?.questionnaire,
-          location: "N/A",
-          level: user.level_name || "N/A",
-          status: user.status === "active" ? "Active" : "Blocked",
-          action: {
-            sId: user.id,
-            user_id: user?.user_id,
-            name: user.full_name,
-            email: user.email,
-            matchId: user?.match_id,
-            matchPlayed: user?.matches_played,
-            questionaries: user?.questionnaire,
-            adjust_status: user?.adjust_status,
-            location: "N/A",
-            level: user.level_name,
-            status: user.status === "active" ? "Active" : "Blocked",
-          },
-        }))
-  );
+  const userDataSource = data?.data?.map((user: any) => ({
+    sId: user.id,
+    image: (
+      <img src={user.image || image} className="w-9 h-9 rounded" alt="avatar" />
+    ),
+    name: user.full_name,
+    email: user.email,
+    matchId: user.match_id,
+    matchPlayed: user?.matches_played,
+    user_id: user?.user_id,
+    questionaries: user?.questionnaire,
+    location: "N/A",
+    level: user.level_name || "N/A",
+    status: user.status === "active" ? "Active" : "Blocked",
+    action: {
+      sId: user.id,
+      image: (
+        <img
+          src={user.image || image}
+          className="w-9 h-9 rounded"
+          alt="avatar"
+        />
+      ),
+      user_id: user?.user_id,
+      name: user.full_name,
+      email: user.email,
+      matchId: user?.match_id,
+      matchPlayed: user?.matches_played,
+      questionaries: user?.questionnaire,
+      adjust_status: user?.adjust_status,
+      location: "N/A",
+      level: user.level_name,
+      status: user.status === "active" ? "Active" : "Blocked",
+    },
+  }));
 
   const columns = [
     {
@@ -210,12 +213,19 @@ console.log("26", data?.data);
           onConfirm={toggleButtonLabel}
           value={userData}
           style={{
-         
+            padding: "20px",
             maxHeight: "90vh", // Set modal height to 50vh or "100vh" for full-screen
             overflowY: "auto", // Enable scrolling
           }}
         >
-          <div className="bg-gray-900 p-4 rounded">
+          <div className="bg-gray-900 p-4 rounded m-6">
+            <div className="flex items-center justify-center my-6">
+              <img
+                src={userData?.image?.props?.src}
+                className="w-24 h-24 rounded-full"
+                alt="avatar"
+              />
+            </div>
             <p>
               <strong>Full Name:</strong> {userData?.name}
             </p>

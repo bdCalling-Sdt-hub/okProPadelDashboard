@@ -8,7 +8,7 @@ const putFeedbackToggleLevelsApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: data,
             }),
-            invalidatesTags: ["Users"],
+            invalidatesTags: ["Feedback"],
         }),
     }),
 });

@@ -22,7 +22,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
     console.log("22, ModalComponent received value:", value);
     setButtonLabel(value?.adjust_status === "N/A" && "down" || value?.level ==="Beginner" ? "up" : "down")
 
-  }, [value?.adjust_status]);
+  }, [value?.adjust_status, value?.level ==="Beginner"]);
 
   const hideModal = () => {
     setOpenModel(false);
@@ -91,7 +91,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
         <h2 className="text-lg text-gray-600">{subtitle}</h2>
       </div>
       {children}
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <p>
           <strong>Name:</strong> {value?.full_name}
         </p>
@@ -99,7 +99,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
           <strong>Email:</strong> {value?.email}
         </p>
         <p><strong>Match ID:</strong> {value?.match_id}</p>
-      </div>
+      </div> */}
       <div className="flex justify-center">
         <Button onClick={hideModal} style={{ marginRight: "10px" }}>
           {cancelLabel}
