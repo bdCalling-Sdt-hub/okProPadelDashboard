@@ -24,6 +24,8 @@ import Volunteer from "../pages/Volunteer";
 import Profile from "../pages/Profile";
 import SeeSetupTrialMatch from "../pages/SeeSetupTrialMatch";
 import FeedBack from "../pages/FeedBack";
+import AdminRoutes from "./AdminRoutes";
+import ErrorPage from "../pages/ErrorPage";
 
 
 
@@ -36,78 +38,79 @@ const router = createBrowserRouter([
     {
         path: "/",
         element: <Dashboard handleNotifications={handleNotifications} />,
+        errorElement: <ErrorPage />,
         children: [
             {
                 path: "/",
-                element: <DasboardHome />,
+                element: <AdminRoutes><DasboardHome /></AdminRoutes>,
             },
             {
                 path: "/club",
-                element: <Club />,
+                element: <AdminRoutes><Club /></AdminRoutes>,
             },
             {
                 path: "/notifications",
-                element: <Notifications />,
+                element: <AdminRoutes><Notifications /></AdminRoutes>,
             },
             {
                 path: "/request",
-                element: <Request />,
+                element: <AdminRoutes><Request /></AdminRoutes>,
             },
             {
                 path: "/seeTrialMatch",
-                element: <SeeSetupTrialMatch />
+                element: <AdminRoutes><SeeSetupTrialMatch /></AdminRoutes>
             },
             {
                 path: "/volunteer",
-                element: <Volunteer />
+                element: <AdminRoutes><Volunteer /></AdminRoutes>
             },
             {
                 path: "/manage-users",
-                element: <Manage_Users />,
+                element: <AdminRoutes><Manage_Users /></AdminRoutes>,
             },
             {
                 path: "/manage-users/seller-profile/:id",
-                element: <Seller_Profile />,
+                element: <AdminRoutes><Seller_Profile /></AdminRoutes>,
             },
             {
                 path: "/love",
-                element: <Love />,
+                element: <AdminRoutes><Love /></AdminRoutes>,
             },
             {
                 path: "/transactions",
-                element: <Transactions />,
+                element: <AdminRoutes><Transactions /></AdminRoutes>,
             },
             {
                 path: "/questionaries",
-                element: <Questionaries />
+                element:<AdminRoutes> <Questionaries /></AdminRoutes>
             },
             {
                 path: "/feedback",
-                element: <FeedBack />
+                element: <AdminRoutes><FeedBack /></AdminRoutes>
             },
             {
                 path: "/settings",
-                element: <SettingsPage />,
+                element: <AdminRoutes><SettingsPage /></AdminRoutes>,
             },
             {
                 path: "/settings/personalInformation",
-                element: <Settings_personalInformation />,
+                element: <AdminRoutes><Settings_personalInformation /></AdminRoutes>,
             },
             {
                 path: "/settings/faq",
-                element: <SettingsFaq />,
+                element: <AdminRoutes><SettingsFaq /></AdminRoutes>,
             },
             {
                 path: "/settings/termsAndCondition",
-                element: <SettingsTermsAndConditions />
+                element: <AdminRoutes><SettingsTermsAndConditions /></AdminRoutes>
             },
             {
                 path: "settings/termsAndCondition/edittermsAndConditions/:id",
-                element: <EditTermsAndCondition />
+                element: <AdminRoutes><EditTermsAndCondition /></AdminRoutes>
             },
             {
                 path: "profile",
-                element: <Profile />
+                element:<AdminRoutes> <Profile /></AdminRoutes>
             },
         ]
     },

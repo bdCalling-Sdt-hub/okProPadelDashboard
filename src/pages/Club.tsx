@@ -22,6 +22,20 @@ import {
   LoadScript,
   Marker,
 } from "@react-google-maps/api";
+import Swal from "sweetalert2";
+
+
+interface Club {
+  club_name: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+  activities: string[];
+  website: string;
+  location: string;
+  banners?: string[];
+  sponsored?: boolean;
+}
 
 const Club: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -37,6 +51,11 @@ console.log("36", latitude, longitude);
   const googleMapApiKey = "AIzaSyBOx-P4WZSYeCYMbWa37lP7QMVVSuip9sc";
 
   const { data, isLoading, isError, refetch } = useGetAllClubQuery();
+  console.log("data 40",data)
+  const clubName = Array.isArray(data?.data?.clubs) 
+  ? data.data?.clubs?.map((c) => c?.club_name)
+  : []; 
+  console.log("44",clubName)
   const [postCreateclub, { isLoading: isCreating }] =
     usePostCreateclubMutation();
   const [putUpdateClub, { isLoading: isUpdating }] = usePutUpdateClubMutation();
@@ -93,23 +112,27 @@ console.log("36", latitude, longitude);
         formData.append(`banners[${index}]`, file.originFileObj, file.name);
       }
     });
+//  if (clubName.includes(values.clubName)) {
+//     Swal.fire("Error", "Club name already exists!", "error");
+//     return; // Stop execution if duplicate is found
+//   }
 
-    formData.append("club_name", values.clubName);
-    formData.append("description", values.description);
-    formData.append("latitude", latitude?.toString());
-    formData.append("longitude", longitude?.toString());
-    formData.append("sponsored", sponsored ? "true" : "false");
+formData.append("club_name", values.clubName);
+formData.append("description", values.description);
+formData.append("latitude", latitude?.toString());
+formData.append("longitude", longitude?.toString());
+formData.append("sponsored", sponsored ? "true" : "false");
+formData.append("activities", values?.activities)
+// Convert `activities` input into an array and append each item individually
+// const activitiesArray = values.activities
+//   .split(",")
+//   .map((activity) => activity.trim());
+// activitiesArray.forEach((activity, index) => {
+//   formData.append(`activities[${index}]`, activity);
+// });
 
-    // Convert `activities` input into an array and append each item individually
-    const activitiesArray = values.activities
-      .split(",")
-      .map((activity) => activity.trim());
-    activitiesArray.forEach((activity, index) => {
-      formData.append(`activities[${index}]`, activity);
-    });
-
-    formData.append("website", values.website);
-    formData.append("location", values.location);
+formData.append("website", values.website);
+formData.append("location", values.location);
 
     try {
       if (isEditMode && currentClub) {
@@ -117,8 +140,14 @@ console.log("36", latitude, longitude);
         await putUpdateClub({ id: currentClub.id, data: formData }).unwrap();
         message.success("Club updated successfully!");
       } else {
-        await postCreateclub(formData).unwrap();
-        message.success("Club created successfully!");
+        if(clubName.includes(values.clubName)){
+          Swal.fire("Club name is exist \nplease try again")
+          return;
+        }else {
+          await postCreateclub(formData).unwrap();
+          message.success("Club created successfully!");
+        }
+        
       }
 
       setIsModalVisible(false);
@@ -128,22 +157,28 @@ console.log("36", latitude, longitude);
       message.error("Failed to save club. Please try again.");
     }
   };
-
+console.log("EditMode", isEditMode)
+console.log("current Club", currentClub)
   const handleUpdate = (club: any) => {
+    console.log("Editing Club:", club); // Debugging
+    if (!club) {
+      console.error("Invalid club data provided");
+      return;
+    }
+  
     setIsEditMode(true);
     setCurrentClub(club);
     setIsModalVisible(true);
-
     form.setFieldsValue({
-      clubName: club.club_name,
-      description: club.description,
-      latitude: club.latitude,
-      longitude: club.longitude,
-      activities: club.activities ? club.activities.join(", ") : "",
-      website: club.website,
-      location: club.location,
+      clubName: club?.club_name || "",
+      description: club?.description || "",
+      latitude: club?.latitude || null,
+      longitude: club?.longitude || null,
+      activities: club?.activities || "",
+      website: club?.website || "",
+      location: club?.location || "",
     });
-
+    
     setFileList(
       club.banners?.map((banner: string, index: number) => ({
         uid: index.toString(),
@@ -151,8 +186,9 @@ console.log("36", latitude, longitude);
         url: banner,
       })) || []
     );
-    setSponsored(club.sponsored);
+    setSponsored(!!club.sponsored);
   };
+  
 
   const handleDelete = async (clubId) => {
     if (clubId) {
@@ -268,9 +304,9 @@ console.log("36", latitude, longitude);
           <Form.Item
             name="activities"
             label="Activities"
-            rules={[{ required: true, message: "Please enter activities" }]}
+            rules={[{ required: false, message: "Please enter activities" }]}
           >
-            <Input className="w-full" placeholder="Enter activities separated by commas" />
+            <Input.TextArea className="w-full h-24" placeholder="Enter activities separated by commas" />
           </Form.Item>
 
           <Form.Item

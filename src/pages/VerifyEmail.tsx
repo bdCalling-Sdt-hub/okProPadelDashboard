@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AuthWrapper from "../component/share/AuthWrapper";
 import { Button, Input, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Images/LogoOkProPadel.png";
 import { usePostOtpMutation } from "../redux/features/postOtpVerifyApi";
+import { useResendOtpMutation } from "../redux/features/postResendOtp";
 
 // Assuming `Input.OTP` is a custom input component
 interface OTPInputProps {
@@ -17,8 +18,13 @@ interface OTPInputProps {
 
 const VerifyEmail: React.FC = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('')
   const [otp, setOtp] = useState(''); // State to store OTP input
-
+  const [resendOtp] = useResendOtpMutation()
+  useEffect(() => {
+    const emailGet =   localStorage.getItem("ForgetPasswordEmail");
+    setEmail(emailGet)
+    }, [])
   // Call the mutation hook properly with parentheses
   const [postOtp, { isLoading }] = usePostOtpMutation();
 
@@ -44,7 +50,12 @@ const VerifyEmail: React.FC = () => {
       message.error("Something went wrong, please try again.");
     }
   };
-
+const handleResendOtp = async() => {
+  
+ const response = await resendOtp({email: email}).unwrap(); 
+    
+    console.log("Resend OTP verification response:", response);
+}
   return (
     <AuthWrapper>
       <div className="text-center mb-12">
@@ -80,7 +91,7 @@ const VerifyEmail: React.FC = () => {
 
       <p className="text-center mt-10">
         You have not received the email?
-        <Button className="pl-0" type="link">
+        <Button onClick={handleResendOtp} className="pl-0" type="link">
           Resend
         </Button>
       </p>

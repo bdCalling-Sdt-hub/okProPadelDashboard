@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AuthWrapper from "../component/share/AuthWrapper";
 import { Button, Checkbox, Form, Input } from "antd";
 import { Link, useNavigate } from "react-router-dom";
@@ -14,32 +14,46 @@ interface LoginFormValues {
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [setData, { isLoading, isError, status, error, data }] = usePostLoginMutation();
+  const [form] = Form.useForm(); 
+  const [setData, { isLoading, isError, status, error, data }] =
+    usePostLoginMutation();
 
-  const onFinish = async () => {
-    const payload = { email, password };
-    console.log("Sending payload:", payload);
-  
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    const savedPassword = localStorage.getItem("rememberedPassword");
+    const savedRemember = !!(savedEmail && savedPassword);
+
+    // Dynamically set form fields when localStorage values are loaded
+    form.setFieldsValue({
+      email: savedEmail || "",
+      password: savedPassword || "",
+      remember: savedRemember,
+    });
+  }, [form]);
+
+  const onFinish = async (values: LoginFormValues) => {
+    const { email, password, remember } = values;
+    console.log("Sending payload:", { email, password });
+
     try {
-      const response = await setData(payload);
-      console.log("27, Response:", response);
-      console.log("28", response?.data.data?.token);
-  
+      const response = await setData({ email, password });
+      console.log("Response:", response);
+
       if (response?.error) {
-        // Show error message from the server, if available
         Swal.fire({
           icon: "error",
           title: "Login Failed",
           text: response.error.data?.message || "An error occurred.",
         });
       } else if (response?.data) {
-        // Handle successful login
         localStorage.setItem("token", response?.data.data?.token);
-        // localStorage.setItem("refresh_token", response.data?.data?.attributes?.token?.refreshToken);
-        // localStorage.setItem("user-update", JSON.stringify(response.data.data));
-  
+        if (remember) {
+          localStorage.setItem("rememberedEmail", email);
+          localStorage.setItem("rememberedPassword", password);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+          localStorage.removeItem("rememberedPassword");
+        }
         Swal.fire({
           position: "top-center",
           icon: "success",
@@ -65,35 +79,29 @@ const Login: React.FC = () => {
         <div className="flex py-8">
           <div className="flex items-center mx-auto gap-2">
             <img src={logo} alt="Logo" className="w-20" />
-            <h1 className="font-bold text-3xl">Choozy</h1>
+            <h1 className="font-bold text-3xl">OkPro Padel</h1>
           </div>
         </div>
         <p>Please enter your email and password to continue</p>
       </div>
-      <Form<LoginFormValues> layout="vertical" onFinish={onFinish}>
+      <Form<LoginFormValues>
+        form={form} // Bind the form instance
+        layout="vertical"
+        onFinish={onFinish}
+      >
         <Form.Item
           label="Email"
           name="email"
           rules={[{ required: true, message: "Please enter your email" }]}
         >
-          <Input
-            placeholder="Enter your email"
-            style={{ height: "50px" }}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <Input placeholder="Enter your email" style={{ height: "50px" }} />
         </Form.Item>
         <Form.Item
           label="Password"
           name="password"
           rules={[{ required: true, message: "Please enter your password" }]}
         >
-          <Input.Password
-            placeholder="Enter your password"
-            style={{ height: "50px" }}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <Input.Password placeholder="Enter your password" style={{ height: "50px" }} />
         </Form.Item>
         <Form.Item>
           <div className="flex justify-between items-center">

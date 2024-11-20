@@ -5,6 +5,8 @@ import ImgCrop from 'antd-img-crop';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { useGetPersonalInformationQuery } from '../redux/features/getPersonalInformationApi';
 import { useUpdatePersonalInformationMutation } from '../redux/features/putUpdatePersonalInfromation';
+import { useUpdateImageMutation } from '../redux/features/putUpdateImage';
+import Swal from 'sweetalert2';
 
 type FileType = Exclude<Parameters<UploadProps['beforeUpload']>[0], undefined>;
 
@@ -24,6 +26,7 @@ const SettingsPersonalInformation: React.FC = () => {
 
   // Fetch personal information data
   const { data, isLoading, isError } = useGetPersonalInformationQuery();
+  const [updateImage] = useUpdateImageMutation();
   const [updatePersonalInformation] = useUpdatePersonalInformationMutation();
 console.log("28", previewImage);
   useEffect(() => {
@@ -51,8 +54,48 @@ console.log("28", previewImage);
     }
   }, [data, isError, form]);
 
-  const onChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+  const onChange: UploadProps['onChange'] = async ({ fileList: newFileList }) => {
     setFileList(newFileList);
+  
+    if (newFileList.length > 0) {
+      const uploadedFile = newFileList[0].originFileObj; // Get the uploaded file
+  
+      if (uploadedFile) {
+        const formData = new FormData();
+        formData.append('_method', 'PUT');
+        formData.append('image', uploadedFile, uploadedFile.name); // Append the image file to FormData
+  
+        try {
+          const response = await updateImage(formData); // Call the mutation
+          console.log('Image upload response:', response);
+  
+          if (response) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Image Updated',
+              text: 'Your profile image has been successfully updated!',
+              timer: 3000,
+              toast: true,
+              position: 'center',
+              showConfirmButton: false,
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to update the image.',
+            });
+          }
+        } catch (error) {
+          console.error('Image upload error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while updating the image.',
+          });
+        }
+      }
+    }
   };
 
   const onPreview = async (file: UploadFile) => {

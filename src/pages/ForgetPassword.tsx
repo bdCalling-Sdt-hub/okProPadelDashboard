@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AuthWrapper from "../component/share/AuthWrapper";
 import { Button, Form, Input } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ interface ForgetPasswordFormValues {
 const ForgetPassword: React.FC = () => {
   const navigate = useNavigate();
   const [setForgetPassword, { isLoading }] = usePostForgetPasswordMutation();
+  const [email, setEmail] = useState('')
 
   const onFinish = async (values: ForgetPasswordFormValues) => {
     console.log("Submitted values:", values);
@@ -20,6 +21,7 @@ const ForgetPassword: React.FC = () => {
     try {
       const response = await setForgetPassword(values).unwrap(); // Unwrap to directly access data
       console.log("API response:", response);
+      localStorage.setItem("ForgetPasswordEmail", email)
 
       if (response?.success) {
         Swal.fire({
@@ -60,7 +62,10 @@ const ForgetPassword: React.FC = () => {
           name="email"
           rules={[{ required: true, message: "Please enter your email" }]}
         >
-          <Input placeholder="Enter your email" style={{ height: "50px" }} />
+          <Input 
+          onChange={(e) => setEmail(e.target.value)}
+          value={email}
+          placeholder="Enter your email" style={{ height: "50px" }} />
         </Form.Item>
 
         <Form.Item>

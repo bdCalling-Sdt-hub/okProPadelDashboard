@@ -28,6 +28,8 @@ import Questionaries from "../../assets/Images/dashboard/questionaries.svg";
 import { BsMicrosoftTeams } from "react-icons/bs";
 import { useGetProfileQuery } from "../../redux/features/getProfleApi";
 import { useGetNotificationsQuery } from "../../redux/features/getNotificationApi";
+import { usePostLogoutMutation } from "../../redux/features/postLogout";
+import Swal from "sweetalert2";
 
 const { Header, Sider, Content } = Layout;
 
@@ -176,15 +178,40 @@ const content = (
 const Dashboard: React.FC = () => {
   const { data, isLoading, isError } = useGetProfileQuery();
   const {data: notification} = useGetNotificationsQuery();
+  const [postLogout] = usePostLogoutMutation();
   console.log(data?.data?.full_name);
   const navigate = useNavigate();
   const location = useLocation();
 const allNotify = notification?.data?.map(item => item?.read_at) || [];
 const nullCount = allNotify.filter(nullCont => nullCont === null).length
 console.log("184", nullCount);
-  const handleLogout = () => {
-    navigate("/auth/login");
-  };
+
+const handleLogout =async () => {
+  const gettoken = localStorage.getItem('token')
+  console.log("136",gettoken)
+  const response= await postLogout();
+  localStorage.removeItem('token')
+  if (response) {
+    Swal.fire({
+      icon: 'success',
+      title: 'LOGGED OUT',
+      text: 'Logout Success',
+      timer: 3000,
+      toast: true,
+      position: 'center',
+      showConfirmButton: false,
+    });
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Failed to update the image.',
+    });
+  }
+  console.log("138",response)
+  navigate("/auth/login");
+};
+
 
   const handleNotifications = () => {
     navigate("/notifications");
@@ -272,6 +299,7 @@ console.log("184", nullCount);
           style={{ background: "#1E1E1E", color: "white" }}
           // defaultSelectedKeys={["1"]}
           selectedKeys={[location.pathname]}
+         
         >
           <div className="flex flex-col justify-between h-[90vh]">
             <div className="px-4">

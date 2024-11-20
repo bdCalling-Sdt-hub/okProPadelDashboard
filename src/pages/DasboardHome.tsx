@@ -3,6 +3,7 @@ import RevenueChart from "../component/dashHome/RevenuuesChart";
 import Status from "../component/dashHome/Status";
 import SelectBox from "../component/share/SelectBox";
 import SellerActivityChart from "../component/manageUsers/SellerActivityChart";
+import { useChartDatasQuery } from "../redux/features/getDashChartData";
 
 type Props = {};
 const selectOptions = [
@@ -12,6 +13,8 @@ const selectOptions = [
 ];
 const DasboardHome = (props: Props) => {
   const [selectedValue, setSelectedValue] = useState();
+  const {data: chartData} = useChartDatasQuery();
+console.log("23",chartData?.data?.created_community)
   const handleSelectChange = (value: string) => {
     setSelectedValue(value);
     console.log("Selected", value);
