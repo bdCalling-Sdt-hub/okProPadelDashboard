@@ -6,17 +6,17 @@ import { useGetTermsAndConditionQuery } from "../redux/features/getTermsAndCondi
 
 const SettingsTermsAndConditions = () => {
   const { data, isLoading, isError } = useGetTermsAndConditionQuery();
-  console.log("9", data);
   const navigate = useNavigate();
 
   const handleBackSettings = () => {
     navigate("/settings/personalInformation");
   };
 
-  const handleEdit = (id) => {
-    if (id) {
-      navigate(`/settings/termsAndCondition/edittermsAndConditions/${id}`);
-    }
+  const handleEdit = () => {
+    console.log("Edit not works")
+    // if (id) {
+      navigate(`/settings/termsAndCondition/edittermsAndConditions`);
+    // }
   };
 
   if (isLoading) {
@@ -24,8 +24,19 @@ const SettingsTermsAndConditions = () => {
   }
 
   if (isError) {
-    return <Alert message="Error" description="Failed to load content." type="error" showIcon />;
+    return (
+      <Alert
+        message="Error"
+        description="Failed to load content."
+        type="error"
+        showIcon
+      />
+    );
   }
+
+  // Check if data or content is missing
+  const content = data?.data?.content;
+  const noData = !content || content.trim() === "";
 
   return (
     <div className="w-[79vw]">
@@ -39,11 +50,15 @@ const SettingsTermsAndConditions = () => {
         </div>
       </div>
       <div className="pl-10 text-justify py-12">
-        <p>{data?.data?.content}</p>
+        {noData ? (
+          <p>No data found</p>
+        ) : (
+          <p>{content}</p>
+        )}
       </div>
       <div className="flex justify-end">
         <Button
-          onClick={() => handleEdit(data?.data?.id)}
+          onClick={() => handleEdit()}
           style={{
             backgroundColor: "#193664",
             color: "#fff",

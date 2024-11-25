@@ -4,7 +4,7 @@ const postTermsAndConditionApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
       postTermsAndCondition: builder.mutation({
         query: (data) => ({
-          url: `/terms-and-conditions/1`,
+          url: `/terms-and-conditions`,
           method: 'POST',
           body: data,
          

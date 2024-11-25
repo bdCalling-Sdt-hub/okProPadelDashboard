@@ -7,4 +7,9 @@ export default defineConfig({
     react(),
     svgr(),
   ],
+  server: {
+    host: '192.168.12.157', // Bind to all network interfaces
+    port: 3000,       // Optional: specify the port (default is 5173)
+    open: true,       // Optional: automatically open the browser
+  },
 })

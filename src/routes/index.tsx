@@ -105,7 +105,7 @@ const router = createBrowserRouter([
                 element: <AdminRoutes><SettingsTermsAndConditions /></AdminRoutes>
             },
             {
-                path: "settings/termsAndCondition/edittermsAndConditions/:id",
+                path: "settings/termsAndCondition/edittermsAndConditions",
                 element: <AdminRoutes><EditTermsAndCondition /></AdminRoutes>
             },
             {
