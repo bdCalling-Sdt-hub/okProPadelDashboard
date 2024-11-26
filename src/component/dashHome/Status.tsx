@@ -15,7 +15,7 @@ const Status: React.FC = () => {
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [selectedValue, setSelectedValue] = useState<string | undefined>();
   const { data, isLoading, isError, error } = useGetDashHomeStatusApiQuery();
-
+console.log("18", data?.data)
   // Convert the API data into an array format for mapping
   const cardDataa: CardDataItem[] = data?.data
   
@@ -23,6 +23,7 @@ const Status: React.FC = () => {
         { id: 1, value: data.data.total_users, title: "Total Users", description: "Total registered users" },
         { id: 2, value: data.data.total_volunteers, title: "Volunteers", description: "Total volunteers" },
         { id: 3, value: data.data.total_clubs, title: "Clubs", description: "Total clubs" },
+        { id: 4, value: data.data.padelMatchPlayed, title: "Match Played", description: "Total Padel Match Played" },
       ]
     : [];
     console.log("28",cardDataa);
@@ -57,11 +58,11 @@ console.log("44", cardDataa);
           />
         </div> */}
       </div>
-      <div className="grid grid-cols-3 w-[calc(100% -300px)] mt-[12px]">
+      <div className="grid grid-cols-4 w-[calc(100% -300px)] mt-[12px]">
         {cardDataa.map((card, index) => (
           <div
             key={card.id}
-            className={`2xl:w-[480px] xl:w-[200px] lg:w-[150px] w-[450px] h-[210px] px-[20px] py-[32px] flex justify-between items-center rounded-2xl cursor-pointer ${
+            className={`2xl:w-[350px] xl:w-[200px] lg:w-[150px] w-[450px] h-[210px] px-[20px] py-[32px] flex justify-between items-center rounded-2xl cursor-pointer ${
               selectedCard === index ? 'bg-[#02B5AA] text-[#E8EBF0]' : 'border border-[#E7E7E7]'
             }`}
             onClick={() => handleCardClick(index)}

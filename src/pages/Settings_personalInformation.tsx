@@ -171,16 +171,17 @@ console.log("28", previewImage);
         <Form.Item<FieldType>
           name="name"
           label="Name"
-          rules={[{ required: false, message: 'Please input your name!' }]}
+          
+          rules={[{ required: false, message: 'Please input your name!',  }]}
         >
-          <Input placeholder="Name" className='h-12' />
+          <Input  placeholder="Name" className='h-12' />
         </Form.Item>
         <Form.Item<FieldType>
           name="email"
           label="Email"
           rules={[{ required: true, message: 'Please input your email!' }]}
         >
-          <Input placeholder="Email" className='h-12' />
+          <Input readOnly placeholder="Email" className='h-12' />
         </Form.Item>
         <Form.Item<FieldType>
           name="oldPassword"

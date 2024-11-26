@@ -26,6 +26,8 @@ import SeeSetupTrialMatch from "../pages/SeeSetupTrialMatch";
 import FeedBack from "../pages/FeedBack";
 import AdminRoutes from "./AdminRoutes";
 import ErrorPage from "../pages/ErrorPage";
+import Settings_AboutUs from "../pages/Settings_AboutUs";
+import EditAboutus from "../pages/EditAboutUs";
 
 
 
@@ -91,6 +93,14 @@ const router = createBrowserRouter([
             {
                 path: "/settings",
                 element: <AdminRoutes><SettingsPage /></AdminRoutes>,
+            },
+            {
+                path: "/settings/aboutus",
+                element: <AdminRoutes><Settings_AboutUs/></AdminRoutes>,
+            },
+            {
+                path: "/settings/aboutus/editAboutus",
+                element: <AdminRoutes><EditAboutus/></AdminRoutes>,
             },
             {
                 path: "/settings/personalInformation",

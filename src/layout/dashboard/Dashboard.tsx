@@ -29,6 +29,7 @@ import { BsMicrosoftTeams } from "react-icons/bs";
 import { useGetProfileQuery } from "../../redux/features/getProfleApi";
 import { useGetNotificationsQuery } from "../../redux/features/getNotificationApi";
 import { usePostLogoutMutation } from "../../redux/features/postLogout";
+import { HiOutlineUserGroup, HiUserGroup } from "react-icons/hi2";
 import Swal from "sweetalert2";
 
 const { Header, Sider, Content } = Layout;
@@ -139,6 +140,12 @@ const menuItems: MenuItem[] = [
     ),
     children: [
       {
+        path: "/settings/aboutus",
+        title: "About us",
+        icon: <HiOutlineUserGroup size={18} color="white" />,
+        activeIcon: <HiUserGroup size={18} color="white" />,
+      },
+      {
         path: "/settings/personalInformation",
         title: "Personal information",
         icon: <FaRegUserCircle size={18} color="white" />,
@@ -177,6 +184,7 @@ const content = (
 
 const Dashboard: React.FC = () => {
   const { data, isLoading, isError } = useGetProfileQuery();
+  console.log("dash data",data?.data)
   const {data: notification} = useGetNotificationsQuery();
   const [postLogout] = usePostLogoutMutation();
   console.log(data?.data?.full_name);
@@ -361,8 +369,8 @@ const handleLogout =async () => {
                 }
               })}
             </div>
-            <div className="flex w-full px-4">
-              <div className=" flex gap-2 w-[900px] items-center">
+            <div className="flex w-full px-4 items-center justify-center">
+              <div className=" flex gap-2 w-[2000px] items-center">
                 <Popover
                   className="cursor-pointer"
                   placement="top"
@@ -396,8 +404,8 @@ const handleLogout =async () => {
                 </Popover>
 
                 <div className="space-y-4">
-                  <h1 className="text-white">Maria</h1>
-                  <h1 className="text-white">ex@ample.com</h1>
+                  <h1 className="text-white">{data?.data?.full_name}</h1>
+                  <h1 className="text-white">{data?.data?.email}</h1>
                 </div>
               </div>
               <Menu.Item
