@@ -190,17 +190,39 @@ const SettingsFaq: React.FC = () => {
     console.log("Active panel changed: ", activeKey);
   };
 
+  // const handleDelete = async (key: string) => {
+  //   try {
+  //     await deleteFaq({ id: key }).unwrap();
+  //     const updatedData = { ...panelData };
+  //     delete updatedData[key];
+  //     setPanelData(updatedData);
+  //     message.success("FAQ deleted successfully.");
+  //   } catch (error) {
+  //     message.error("Failed to delete FAQ.");
+  //   }
+  // };
   const handleDelete = async (key: string) => {
     try {
+      if (key.startsWith("new-")) {
+        // Handle unsaved (new) panels
+        const updatedData = { ...panelData };
+        delete updatedData[key]; // Remove the new panel directly
+        setPanelData(updatedData);
+        message.success("Unsaved FAQ deleted successfully.");
+        return; // Exit the function as no API call is needed
+      }
+  
+      // For saved FAQs, delete from the database
       await deleteFaq({ id: key }).unwrap();
       const updatedData = { ...panelData };
-      delete updatedData[key];
+      delete updatedData[key]; // Remove the panel from the state
       setPanelData(updatedData);
       message.success("FAQ deleted successfully.");
     } catch (error) {
       message.error("Failed to delete FAQ.");
     }
   };
+  
 
   return (
     <div>

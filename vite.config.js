@@ -8,7 +8,7 @@ export default defineConfig({
     svgr(),
   ],
   server: {
-    host: '167.172.240.116', // Bind to all network interfaces
+    host: '192.168.12.157', // Bind to all network interfaces
     port: 3000,       // Optional: specify the port (default is 5173)
     open: true,       // Optional: automatically open the browser
   },

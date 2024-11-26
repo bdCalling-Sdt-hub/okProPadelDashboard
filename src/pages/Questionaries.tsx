@@ -46,17 +46,34 @@ const Questionaries: React.FC = () => {
   useEffect(() => {
     if (data && data.data && data.data.data) {
       const initialData: MatchData = {};
-      data.data.data.forEach((item: any) => {
+      console.log("49 - Full Data:", data.data.data); // Logs the entire data array
+  
+      data.data.data.map((item: any) => {
+        // Log each item
+        console.log("Item:", item);
+  
+        // Log individual answers
+        console.log("Answer A:", item?.options?.A?.option);
+        console.log("Answer b:", item?.options?.B?.option);
+        console.log("Answer c:", item?.options?.C?.option);
+        console.log("Answer d:", item?.options?.D?.option);
+       
+  
         initialData[item.id] = {
           label: item.question,
           content: item.content || "Default content",
-          answers: [item.A, item.B, item.C, item.D],
+          answers: [
+            item?.options?.A?.option || "Answer A: Not provided",
+            item?.options?.B?.option || "Answer B: Not provided",
+            item?.options?.C?.option || "Answer C: Not provided",
+            item?.options?.D?.option || "Answer D: Not provided",
+          ],
         };
       });
       setNormalMatchData(initialData);
     }
   }, [data]);
-  
+
   useEffect(() => {
     if (trialMatcAll && trialMatcAll.data && trialMatcAll.data.data) {
       const initialData: MatchData = {};
@@ -64,15 +81,17 @@ const Questionaries: React.FC = () => {
         initialData[item.id] = {
           label: item.question,
           content: item.content || "Default content",
-          answers: [item.A, item.B, item.C, item.D],
+          answers: [
+            item?.options?.A?.option || "Answer A: Not provided",
+            item?.options?.B?.option || "Answer B: Not provided",
+            item?.options?.C?.option || "Answer C: Not provided",
+            item?.options?.D?.option || "Answer D: Not provided",
+          ],
         };
       });
       setTrialMatchData(initialData);
     }
   }, [trialMatcAll]);
-  
-
- 
 
   //   const handleEdit = (key: string, dataType: "normal" | "trial") => {
   //     setEditingPanel(key);
@@ -331,24 +350,63 @@ const Questionaries: React.FC = () => {
   //   }));
   // };
 
-  const handleDeletePanel = async (
-    key: string,
-    dataType: "normal" | "trial"
-  ) => {
+  // const handleDeletePanel = async (
+  //   key: string,
+  //   dataType: "normal" | "trial"
+  // ) => {
+  //   try {
+  //     if (dataType === "normal") {
+  //       // Call the delete API and wait for the response
+  //       await deleteNormalMatchQuestion({ id: key }).unwrap();
+  //       console.log("Delete success");
+
+  //       // Update the local state after successful API deletion
+  //       const updatedData = { ...normalMatchData };
+  //       delete updatedData[key];
+  //       setNormalMatchData(updatedData);
+  //     } else {
+  //       await deleteTrialMatchQuestion({ id: key }).unwrap();
+  //       console.log("Delete success");
+  //       // Handle the trial match data deletion similarly
+  //       const updatedData = { ...trialMatchData };
+  //       delete updatedData[key];
+  //       setTrialMatchData(updatedData);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error deleting question:", error);
+  //   }
+  // };
+  const handleDeletePanel = async (key: string, dataType: "normal" | "trial") => {
     try {
+      if (key.startsWith("new-")) {
+        // Handle deletion for unsaved (new) panels
+        console.log("Deleting new (unsaved) panel:", key);
+  
+        if (dataType === "normal") {
+          const updatedData = { ...normalMatchData };
+          delete updatedData[key];
+          setNormalMatchData(updatedData);
+        } else {
+          const updatedData = { ...trialMatchData };
+          delete updatedData[key];
+          setTrialMatchData(updatedData);
+        }
+  
+        return; // Exit function after handling local deletion
+      }
+  
+      // Handle deletion for saved panels (API call)
       if (dataType === "normal") {
-        // Call the delete API and wait for the response
         await deleteNormalMatchQuestion({ id: key }).unwrap();
         console.log("Delete success");
-
-        // Update the local state after successful API deletion
+  
         const updatedData = { ...normalMatchData };
         delete updatedData[key];
         setNormalMatchData(updatedData);
       } else {
         await deleteTrialMatchQuestion({ id: key }).unwrap();
         console.log("Delete success");
-        // Handle the trial match data deletion similarly
+  
         const updatedData = { ...trialMatchData };
         delete updatedData[key];
         setTrialMatchData(updatedData);
@@ -357,7 +415,7 @@ const Questionaries: React.FC = () => {
       console.error("Error deleting question:", error);
     }
   };
-
+  
   const handleAnswerChange = (index: number, value: string) => {
     const updatedAnswers = [...tempAnswers];
     updatedAnswers[index] = value;
@@ -370,6 +428,7 @@ const Questionaries: React.FC = () => {
       handleEdit(activeKey, activeKey.startsWith("trial") ? "trial" : "normal");
     }
   };
+
   const normalMatchItems: CollapseProps["items"] = Object.keys(
     normalMatchData
   ).map((key) => ({
@@ -387,7 +446,7 @@ const Questionaries: React.FC = () => {
             <div className="flex items-center">
               <span>{normalMatchData[key].label}</span>
             </div>
-            <div>
+            <div className="flex">
               <Button
                 onClick={() => handleEdit(key, "normal")}
                 type="link"
@@ -401,7 +460,7 @@ const Questionaries: React.FC = () => {
                 danger
                 className="ml-2"
               >
-                 <Trash />
+                <Trash />
               </Button>
             </div>
           </div>
@@ -411,15 +470,18 @@ const Questionaries: React.FC = () => {
       editingPanel === key ? (
         <div>
           {/* Display existing data as default values in editable fields */}
-          {tempAnswers.map((answer, index) => (
-            <Input
-              key={index}
-              value={answer}
-              onChange={(e) => handleAnswerChange(index, e.target.value)}
-              placeholder={`Answer option ${index + 1}`} // Placeholder for answers
-              className="mt-2"
-            />
-          ))}
+          {tempAnswers.map((answer, index) => {
+            console.log("415", answer);
+            return (
+              <Input
+                key={index}
+                value={answer}
+                onChange={(e) => handleAnswerChange(index, e.target.value)}
+                placeholder={`Answer option ${index + 1}`} // Placeholder for answers
+                className="mt-2"
+              />
+            );
+          })}
           <Button
             onClick={() => handleSave(key, "normal")}
             type="primary"
@@ -458,13 +520,13 @@ const Questionaries: React.FC = () => {
             <div className="flex items-center">
               <span>{trialMatchData[key].label}</span>
             </div>
-            <div>
+            <div className="flex">
               <Button
                 onClick={() => handleEdit(key, "trial")}
                 type="link"
                 className=""
               >
-              <Pencil />
+                <Pencil />
               </Button>
               <Button
                 onClick={() => handleDeletePanel(key, "trial")}
@@ -559,3 +621,216 @@ const Questionaries: React.FC = () => {
 };
 
 export default Questionaries;
+
+
+// import React, { useState, useEffect } from "react";
+// import { Collapse, Input, Button } from "antd";
+// import type { CollapseProps } from "antd";
+// import { useNavigate } from "react-router-dom";
+// import { useUpdateNormalMatchQuestionMutation } from "../redux/features/putUpdateNormalMatchQuestion";
+// import { useUpdateTrialMatchQuestionMutation } from "../redux/features/putUpdateTrialMatchQuestion";
+// import { useDeleteNormalMatchQuestionMutation } from "../redux/features/deleteNormalMatchQuestion";
+// import { useAddNormalMatchQuestionMutation } from "../redux/features/postAddNormalMatchQuestionApi";
+// import { useGetNormalMatchQuestionQuery } from "../redux/features/getNormalMatchQuestionApi";
+// import { useAddTrialMatchQuestionMutation } from "../redux/features/postAddTrialMatchQuestion";
+// import { useTrialMatchQuestionQuery } from "../redux/features/getTrialMatchQuestion";
+// import { useDeleteTrialMatchQuestionMutation } from "../redux/features/deleteTrialMatchQuestion";
+// import { Pencil, Trash } from "lucide-react";
+
+// interface MatchData {
+//   [key: string]: {
+//     label: string;
+//     content: string;
+//     answers: string[];
+//   };
+// }
+
+// const Questionaries: React.FC = () => {
+//   const [normalMatchData, setNormalMatchData] = useState<MatchData>({});
+//   const [trialMatchData, setTrialMatchData] = useState<MatchData>({});
+//   const [editingPanel, setEditingPanel] = useState<string | null>(null);
+//   const [tempContent, setTempContent] = useState<string>("");
+//   const [tempLabel, setTempLabel] = useState<string>("");
+//   const [tempAnswers, setTempAnswers] = useState<string[]>(["", "", "", ""]);
+//   const [updateNormalMatchQuestion] = useUpdateNormalMatchQuestionMutation();
+//   const [updateTrialMatchQuestion] = useUpdateTrialMatchQuestionMutation();
+//   const [deleteNormalMatchQuestion] = useDeleteNormalMatchQuestionMutation();
+//   const [deleteTrialMatchQuestion] = useDeleteTrialMatchQuestionMutation();
+//   const [addNormalMatchQuestion] = useAddNormalMatchQuestionMutation();
+//   const { data } = useGetNormalMatchQuestionQuery();
+//   const { data: trialMatcAll } = useTrialMatchQuestionQuery();
+//   const [addTrialMatchQuestion] = useAddTrialMatchQuestionMutation();
+
+//   const questenaries = data?.data?.data || [];
+//   const trialMatchQuestion = trialMatcAll?.data?.data || [];
+
+//   useEffect(() => {
+//     // Populate normal match data
+//     if (data && data.data && data.data.data) {
+//       const initialData: MatchData = {};
+//       data.data.data.forEach((item: any) => {
+//         initialData[item.id] = {
+//           label: item.question || "No question provided",
+//           content: item.content || "Default content",
+//           answers: [
+//             item.A || "Answer 1: Not provided",
+//             item.B || "Answer 2: Not provided",
+//             item.C || "Answer 3: Not provided",
+//             item.D || "Answer 4: Not provided",
+//           ],
+//         };
+//       });
+//       setNormalMatchData(initialData);
+//     }
+//   }, [data]);
+
+//   useEffect(() => {
+//     // Populate trial match data
+//     if (trialMatcAll && trialMatcAll.data && trialMatcAll.data.data) {
+//       const initialData: MatchData = {};
+//       trialMatcAll.data.data.forEach((item: any) => {
+//         initialData[item.id] = {
+//           label: item.question || "No question provided",
+//           content: item.content || "Default content",
+//           answers: [
+//             item.A || "Answer 1: Not provided",
+//             item.B || "Answer 2: Not provided",
+//             item.C || "Answer 3: Not provided",
+//             item.D || "Answer 4: Not provided",
+//           ],
+//         };
+//       });
+//       setTrialMatchData(initialData);
+//     }
+//   }, [trialMatcAll]);
+
+//   const handleEdit = (key: string, dataType: "normal" | "trial") => {
+//     setEditingPanel(key);
+//     const data = dataType === "normal" ? normalMatchData[key] : trialMatchData[key];
+//     setTempLabel(data.label);
+//     setTempContent(data.content);
+//     setTempAnswers([...data.answers]);
+//   };
+
+//   const handleSave = async (key: string | null, dataType: "normal" | "trial") => {
+//     if (tempAnswers.some((answer) => !answer.trim())) {
+//       console.error("All answer fields must be filled.");
+//       return;
+//     }
+
+//     const updatedData = {
+//       label: tempLabel,
+//       content: tempContent,
+//       answers: tempAnswers,
+//     };
+
+//     try {
+//       if (dataType === "normal") {
+//         await updateNormalMatchQuestion({ id: key, data: updatedData }).unwrap();
+//         setNormalMatchData((prevState) => ({
+//           ...prevState,
+//           [key!]: updatedData,
+//         }));
+//       } else {
+//         await updateTrialMatchQuestion({ id: key, data: updatedData }).unwrap();
+//         setTrialMatchData((prevState) => ({
+//           ...prevState,
+//           [key!]: updatedData,
+//         }));
+//       }
+//     } catch (error) {
+//       console.error("Error saving question:", error);
+//     }
+
+//     setEditingPanel(null);
+//   };
+
+//   const handleCancel = () => {
+//     setEditingPanel(null);
+//   };
+
+//   const handleDeletePanel = async (key: string, dataType: "normal" | "trial") => {
+//     try {
+//       if (dataType === "normal") {
+//         await deleteNormalMatchQuestion({ id: key }).unwrap();
+//         setNormalMatchData((prevState) => {
+//           const newState = { ...prevState };
+//           delete newState[key];
+//           return newState;
+//         });
+//       } else {
+//         await deleteTrialMatchQuestion({ id: key }).unwrap();
+//         setTrialMatchData((prevState) => {
+//           const newState = { ...prevState };
+//           delete newState[key];
+//           return newState;
+//         });
+//       }
+//     } catch (error) {
+//       console.error("Error deleting question:", error);
+//     }
+//   };
+
+//   const handleAnswerChange = (index: number, value: string) => {
+//     const updatedAnswers = [...tempAnswers];
+//     updatedAnswers[index] = value;
+//     setTempAnswers(updatedAnswers);
+//   };
+
+//   const normalMatchItems = Object.keys(normalMatchData).map((key) => ({
+//     key,
+//     label: (
+//       <div className="flex justify-between items-center">
+//         <span>{normalMatchData[key].label}</span>
+//         <div>
+//           <Button onClick={() => handleEdit(key, "normal")} type="link">
+//             <Pencil />
+//           </Button>
+//           <Button onClick={() => handleDeletePanel(key, "normal")} type="link" danger>
+//             <Trash />
+//           </Button>
+//         </div>
+//       </div>
+//     ),
+//     children: (
+//       <div>
+//         {editingPanel === key ? (
+//           <div>
+//             <Input.TextArea
+//               value={tempContent}
+//               onChange={(e) => setTempContent(e.target.value)}
+//               placeholder="Edit content"
+//             />
+//             {tempAnswers.map((answer, index) => (
+//               <Input
+//                 key={index}
+//                 value={answer}
+//                 onChange={(e) => handleAnswerChange(index, e.target.value)}
+//                 placeholder={`Answer ${index + 1}`}
+//                 className="mt-2"
+//               />
+//             ))}
+//             <Button onClick={() => handleSave(key, "normal")} type="primary" className="mt-2">
+//               Save
+//             </Button>
+//             <Button onClick={handleCancel} className="mt-2 ml-2">
+//               Cancel
+//             </Button>
+//           </div>
+//         ) : (
+//           normalMatchData[key].answers.map((answer, index) => (
+//             <p key={index}>{`Answer ${index + 1}: ${answer}`}</p>
+//           ))
+//         )}
+//       </div>
+//     ),
+//   }));
+
+//   return (
+//     <div>
+//       <Collapse items={normalMatchItems} />
+//     </div>
+//   );
+// };
+
+// export default Questionaries;
