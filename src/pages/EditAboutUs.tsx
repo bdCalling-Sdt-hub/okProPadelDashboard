@@ -19,7 +19,7 @@ const EditAboutus: React.FC = () => {
   const {data} = useGetAboutusQuery();
 
   useEffect(() => {
-    const existingData = data?.data?.content
+    const existingData = data?.data?.about
     // Load initial data (replace with actual data fetching)
     setContent(existingData); // Use the mock data content
   }, []);
@@ -30,7 +30,7 @@ const EditAboutus: React.FC = () => {
       div.innerHTML = content;
       const cleanedContent = div.textContent || div.innerHTML || "";
       // Make the API call
-      const response = await postAboutus({ content: cleanedContent, status: "1", _method: "PUT" }).unwrap();
+      const response = await postAboutus({ about: cleanedContent }).unwrap();
 
       if (response) {
         Swal.fire({
@@ -41,7 +41,7 @@ const EditAboutus: React.FC = () => {
           timer: 1500,
         });
        
-        navigate("/settings/termsAndCondition");
+        navigate("/settings/aboutus");
       }
     } catch (error) {
       Swal.fire({
@@ -54,7 +54,7 @@ const EditAboutus: React.FC = () => {
   };
 
   const handleBackTermsAndCondition = () => {
-    navigate("/settings/termsAndCondition");
+    navigate("/settings/aboutus");
   };
 
   return (

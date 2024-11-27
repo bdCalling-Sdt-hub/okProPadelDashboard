@@ -37,7 +37,7 @@ const Settings_AboutUs = () => {
   }
 
   // Check if data or content is missing
-  const content = data?.data?.content;
+  const content = data?.data?.about;
   const noData = !content || content.trim() === "";
 
   return (
