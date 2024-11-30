@@ -39,7 +39,7 @@ await MarkAsRead(id)
             </sup>
           </a>
         </div>
-        <h1 className="text-[#5E7FD3]">See All</h1>
+        {/* <h1 className="text-[#5E7FD3]">See All</h1> */}
       </div>
       {/* Display Notifications */}
       {data?.data?.map((item, index) => {

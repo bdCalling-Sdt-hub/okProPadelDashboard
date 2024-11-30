@@ -94,14 +94,7 @@ const router = createBrowserRouter([
                 path: "/settings",
                 element: <AdminRoutes><SettingsPage /></AdminRoutes>,
             },
-            {
-                path: "/settings/aboutus",
-                element: <AdminRoutes><Settings_AboutUs/></AdminRoutes>,
-            },
-            {
-                path: "/settings/aboutus/editAboutus",
-                element: <AdminRoutes><EditAboutus/></AdminRoutes>,
-            },
+           
             {
                 path: "/settings/personalInformation",
                 element: <AdminRoutes><Settings_personalInformation /></AdminRoutes>,

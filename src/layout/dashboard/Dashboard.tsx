@@ -187,12 +187,12 @@ const Dashboard: React.FC = () => {
   console.log("dash data",data?.data)
   const {data: notification} = useGetNotificationsQuery();
   const [postLogout] = usePostLogoutMutation();
-  console.log(data?.data?.full_name);
+  console.log("190", data?.data?.full_name);
   const navigate = useNavigate();
   const location = useLocation();
 const allNotify = notification?.data?.map(item => item?.read_at) || [];
 const nullCount = allNotify.filter(nullCont => nullCont === null).length
-console.log("184", nullCount);
+
 
 const handleLogout =async () => {
   const gettoken = localStorage.getItem('token')

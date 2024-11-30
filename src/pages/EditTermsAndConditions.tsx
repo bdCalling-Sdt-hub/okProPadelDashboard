@@ -60,12 +60,12 @@ const EditTermsAndCondition: React.FC = () => {
     <div className="relative ml-[24px] bg-white p-6 rounded-lg shadow-lg">
       <div
         onClick={handleBackTermsAndCondition}
-        className="mt-[44px] cursor-pointer flex items-center pb-3 gap-2"
+        className="mt-[8px] cursor-pointer flex items-center pb-3 gap-2"
       >
         <MdOutlineKeyboardArrowLeft size={34} />
         <h1 className="text-[24px] font-semibold">Edit Terms & Condition</h1>
       </div>
-      <div className="text-justify mt-[24px] relative">
+      <div className="text-justify relative">
         <JoditEditor
           ref={editor}
           value={content}
